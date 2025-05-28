@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "OICAR\\OICAR.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "OICAR-WebApp\\OICAR-WebApp.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
