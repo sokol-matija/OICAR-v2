@@ -10,6 +10,8 @@ A modern React Native mobile application built with Expo and TypeScript for the 
 - **NativeWind** - Tailwind CSS for React Native styling
 - **React Native Reanimated** - Smooth, performant animations
 - **Expo Image** - Optimized image handling
+- **React Native Web** - Run React Native components in web browsers
+- **React DOM** - Web rendering support
 
 ## 📋 Prerequisites
 
@@ -42,7 +44,12 @@ Before you begin, ensure you have the following installed:
    npm install
    ```
 
-3. **Start the development server**
+3. **Install web dependencies (for web browser support)**
+   ```bash
+   npx expo install react-dom react-native-web
+   ```
+
+4. **Start the development server**
    ```bash
    npx expo start
    ```
