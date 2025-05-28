@@ -10,6 +10,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddHttpClient("BackendAPI", client =>
 {
     client.BaseAddress = new Uri("http://localhost:7118");
+}).ConfigurePrimaryHttpMessageHandler(() =>
+{
+    var handler = new HttpClientHandler();
+    if (builder.Environment.IsDevelopment())
+    {
+        handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+    }
+    return handler;
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
