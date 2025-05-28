@@ -50,7 +50,7 @@ Or manually run the SQL script:
 
 ```bash
 # Connect to the container and run the schema
-docker exec -it oicar-sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -d webshopdb -i /docker-entrypoint-initdb.d/Database.sql
+docker exec -it oicar-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -C -d webshopdb -i /docker-entrypoint-initdb.d/Database.sql
 ```
 
 ### 3. Run the Application
@@ -59,11 +59,20 @@ docker exec -it oicar-sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -
 # Start the API backend
 cd OICAR
 dotnet run
+# API will be available at: http://localhost:7118
 
 # In another terminal, start the web application
 cd OICAR-WebApp  
 dotnet run
+# Web app will be available at: http://localhost:5082
 ```
+
+## Access Points
+
+- **Web Application**: http://localhost:5082
+- **API Backend**: http://localhost:7118
+- **API Documentation (Swagger)**: http://localhost:7118/swagger
+- **Database**: localhost:1433 (for DBeaver)
 
 ## Database Connection
 
@@ -103,8 +112,8 @@ The database includes the following main tables:
 
 1. **Start Database**: `docker-compose up -d`
 2. **Run Migrations**: Initialize schema with `./init-database.sh`
-3. **Start API**: `cd OICAR && dotnet run`
-4. **Start Web App**: `cd OICAR-WebApp && dotnet run`
+3. **Start API**: `cd OICAR && dotnet run` (http://localhost:7118)
+4. **Start Web App**: `cd OICAR-WebApp && dotnet run` (http://localhost:5082)
 
 ## Useful Docker Commands
 
@@ -119,7 +128,7 @@ docker-compose down
 docker-compose logs -f
 
 # Connect to SQL Server directly
-docker exec -it oicar-sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd"
+docker exec -it oicar-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -C
 
 # Remove all data (fresh start)
 docker-compose down -v
@@ -127,9 +136,9 @@ docker-compose down -v
 
 ## API Endpoints
 
-The API will be available at `https://localhost:5001` (or the port shown when running `dotnet run`).
+The API will be available at `http://localhost:7118`.
 
-API documentation is available via Swagger UI when running in development mode.
+API documentation is available via Swagger UI at `http://localhost:7118/swagger` when running in development mode.
 
 ## Environment Variables
 
