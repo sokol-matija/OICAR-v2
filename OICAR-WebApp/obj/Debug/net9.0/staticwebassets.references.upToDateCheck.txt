@@ -15,3 +15,9 @@ C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.j
 C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json
+C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json
+C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json
+C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json
+C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json
+C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json
+C:\Users\domin\source\repos\OICAR\OICAR\obj\Debug\net9.0\staticwebassets.build.json

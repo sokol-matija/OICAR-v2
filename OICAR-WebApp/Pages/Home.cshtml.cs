@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using OICAR.DTOs;
 using System.Net.Http.Headers;
-using System.Security.Claims;
+
 
 
 [Authorize]
@@ -133,8 +133,7 @@ public class HomeModel : PageModel
     }
 
 
-    private async Task isAdminAsync()
-    {
+    private async Task isAdminAsync() {
 
         var userId = User.FindFirst("id")?.Value;
         if (!string.IsNullOrEmpty(userId))

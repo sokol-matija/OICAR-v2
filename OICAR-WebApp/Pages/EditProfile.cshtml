@@ -1,0 +1,170 @@
+﻿@page
+@using OICAR.DTOs
+@model Webshop.Pages.EditProfileModel
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+<script>
+    var userProfileData = @Html.Raw(Json.Serialize(Model.UserProfile ?? new UserDTO { }));
+</script>
+
+<main class="container mt-4">
+    <h1>Edit Profile</h1>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success text-center" id="message">
+            @TempData["Message"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center" id="error">
+            @TempData["Error"]
+        </div>
+    }
+
+    <form id="editProfileForm" onsubmit="return false;">
+        <div class="mb-3">
+            <label for="Username" class="form-label">Username</label>
+            <input id="Username" name="Username" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="FirstName" class="form-label">First Name</label>
+            <input id="FirstName" name="FirstName" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="LastName" class="form-label">Last Name</label>
+            <input id="LastName" name="LastName" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="Email" class="form-label">Email</label>
+            <input id="Email" name="Email" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="PhoneNumber" class="form-label">Phone Number</label>
+            <input id="PhoneNumber" name="PhoneNumber" class="form-control" required />
+        </div>
+        <input type="hidden" id="Password" name="Password" />
+        <input type="hidden" id="IsAdmin" name="IsAdmin" />
+        <button type="button" onclick="updateProfile()" class="btn btn-primary">Save Changes</button>
+    </form>
+</main>
+
+@section Scripts {
+    <script>
+        let authInfo = null;
+        $(document).ready(function () {
+            if (userProfileData && Object.keys(userProfileData).length > 0) {
+                populateFormFields(userProfileData);
+            }
+
+            getAuthInfo().then(() => {
+                if (authInfo && authInfo.userId) {
+                    loadUserData();
+                }
+            }).catch(error => {
+                console.error('Error in getting auth info:', error);
+            });
+        });
+
+
+        async function getAuthInfo() {
+            try {
+                const response = await $.get('/EditProfile?handler=AuthInfo');
+                if (response.success) {
+                    authInfo = response;
+                } else {
+                    window.location.href = '/Login';  
+                }
+            } catch (error) {
+                console.error('Error in getting auth info:', error);
+                window.location.href = '/Login';
+            }
+        }
+
+        function populateFormFields(data) {
+            $('#Username').val(data.username || '');
+            $('#FirstName').val(data.firstName || '');
+            $('#LastName').val(data.lastName || '');
+            $('#Email').val(data.email || '');
+            $('#PhoneNumber').val(data.phoneNumber || '');
+            $('#Password').val(data.password || '');
+            $('#IsAdmin').val(data.isAdmin || '');
+        }
+
+        function loadUserData() {
+            if (!authInfo || !authInfo.userId) {
+                return;
+            }
+
+            $.ajax({
+                url: `/EditProfile?handler=UserData&userId=${authInfo.userId}`,
+                type: 'GET',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (data) {
+                    if (!data.success) {
+                        $('#error').text(data.message || 'Failed to load user data.');
+                        return;
+                    }
+
+                    $('#Username').val(data.username);
+                    $('#FirstName').val(data.firstName);
+                    $('#LastName').val(data.lastName);
+                    $('#Email').val(data.email);
+                    $('#PhoneNumber').val(data.phoneNumber);
+                    $('#Password').val(data.password);
+                    $('#IsAdmin').val(data.isAdmin);
+                },
+                error: function (xhr) {
+                    $('#error').text('Failed to load user data. Please try again.');
+                }
+            });
+        }
+
+        function updateProfile() {
+            if (!authInfo || !authInfo.token) {
+                return;
+            }
+
+            userProfileData = {
+                idUser: authInfo.userId,
+                username: $('#Username').val(),
+                firstName: $('#FirstName').val(),
+                lastName: $('#LastName').val(),
+                email: $('#Email').val(),
+                phoneNumber: $('#PhoneNumber').val(),
+                password: $('#Password').val(),
+                isAdmin: $('#IsAdmin').val() === 'true'
+            };
+
+            $.ajax({
+                url: `/EditProfile?handler=UpdateProfile`,
+                type: 'POST',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(userProfileData),
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        $('#message').text('Profile updated successfully!');
+                        setTimeout(() => {
+                            window.location.href = '/Profile';
+                        }, 2000);
+                    } else {
+                        $('#error').text(response.message || 'Failed to update profile.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error details: ", status, error);
+                    $('#error').text('Failed to update profile.');
+                }
+            });
+        }
+
+
+    </script>
+}

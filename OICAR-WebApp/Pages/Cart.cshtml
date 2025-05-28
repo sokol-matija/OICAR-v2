@@ -1,0 +1,68 @@
+﻿@page
+@model CartModel
+@{
+    ViewData["Title"] = "My Cart";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">My Cart</h1>
+
+    @if (Model.CartItemsWithDetails != null && Model.CartItemsWithDetails.Any())
+    {
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.CartItemsWithDetails.Count; i++)
+                {
+                    var cartItemWithDetails = Model.CartItemsWithDetails[i];
+                    var total = cartItemWithDetails.CartItem.Quantity * cartItemWithDetails.ItemDetails.Price;
+                    <tr>
+                        <td>@cartItemWithDetails.ItemDetails.Title</td>
+                        <td>
+                            <form method="post" asp-page-handler="UpdateQuantity">
+                                <input type="hidden" name="index" value="@i" />
+                                <input type="number" name="quantity" value="@cartItemWithDetails.CartItem.Quantity" min="1" class="form-control d-inline-block" style="width: 70px;" />
+                                <button type="submit" class="btn btn-primary btn-sm ms-2">Update</button>
+                            </form>
+                        </td>
+                        <td>$@cartItemWithDetails.ItemDetails.Price.ToString("F2")</td>
+                        <td>$@total.ToString("F2")</td>
+                        <td>
+                            <form method="post" asp-page-handler="RemoveItem">
+                                <input type="hidden" name="index" value="@i" />
+                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="text-end">
+            @{
+                decimal cartTotal = 0;
+                foreach (var cartItemWithDetails in Model.CartItemsWithDetails)
+                {
+                    cartTotal += cartItemWithDetails.CartItem.Quantity * cartItemWithDetails.ItemDetails.Price;
+                }
+            }
+            <h4>Total: $@cartTotal.ToString("F2")</h4>
+            <button class="btn btn-success mt-2">Proceed to Checkout</button>
+        </div>
+    }
+    else
+    {
+        <div class="text-center mt-5">
+            <h3 class="mt-4 text-muted">Your cart is empty</h3>
+            <p class="text-muted">Looks like you haven't added any items to your cart yet.</p>
+            <a class="btn btn-primary mt-3" href="/Home">Start Shopping</a>
+        </div>
+    }
+</div>

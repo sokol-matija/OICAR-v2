@@ -1,0 +1,57 @@
+﻿@page
+@model ItemModel
+@{
+    ViewData["Title"] = "Item Details";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="d-flex justify-content-center align-items-center border rounded" style="width: 100%; height: 400px; background-color: #f8f9fa;">
+                <img src="https://placehold.co/600x600" class="img-fluid" alt="@Model.Item.Title">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h1>@Model.Item.Title</h1>
+            <p>@Model.Item.Description</p>
+            <hr>
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Item ID:</strong> @Model.Item.IDItem</li>
+                <li class="list-group-item"><strong>Category:</strong> @Model.ItemCategoryName</li>
+                <li class="list-group-item"><strong>Tag:</strong> @Model.TagName</li>
+                <li class="list-group-item"><strong>Stock Quantity:</strong> @Model.Item.StockQuantity</li>
+                <li class="list-group-item">
+                    <strong>In Stock:</strong>
+                    <span class="badge @(Model.Item.StockQuantity > 0 ? "bg-success" : "bg-danger")">
+                        @(Model.Item.StockQuantity > 0 ? "Yes" : "No")
+                    </span>
+                </li>
+                <li class="list-group-item"><strong>Price:</strong> $@Model.Item.Price</li>
+                <li class="list-group-item"><strong>Weight:</strong> @Model.Item.Weight kg</li>
+            </ul>
+            <hr>
+            <div class="card-footer text-center">
+                @if (TempData["Message"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                        @TempData["Message"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                        @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                <form method="post" asp-page-handler="AddToCart" asp-route-id="@Model.Item.IDItem">
+                    <input type="hidden" name="itemId" value="@Model.Item.IDItem" />
+                    <button class="btn btn-primary w-100" type="submit" @(Model.Item.StockQuantity > 0 ? "" : "disabled")>
+                        Add to Cart
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

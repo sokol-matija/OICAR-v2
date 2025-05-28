@@ -20,6 +20,22 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/AdminItems.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5JdGVtcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/AdminsUsers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5zVXNlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Cart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/EditProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRWRpdFByb2ZpbGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -32,8 +48,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Index1.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgxLmNzaHRtbA==
+[C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Item.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSXRlbS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Login.cshtml]
@@ -44,8 +60,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9nb3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Logs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9ncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/domin/source/repos/OICAR/OICAR-WebApp/Pages/Register.cshtml]

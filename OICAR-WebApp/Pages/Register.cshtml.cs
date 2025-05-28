@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using OICAR.DTOs;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
-namespace OICAR_WebApp.Pages
+namespace UI.Pages
 {
     public class RegisterModel : PageModel
     {

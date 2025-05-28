@@ -3,33 +3,85 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - OICAR_WebApp</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - UI</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="bg-dark text-white py-2">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">OICAR_WebApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small><i class="fas fa-phone me-2"></i>+385 91 772 9143</small>
+                        <small class="ms-3"><i class="fas fa-envelope me-2"></i>support@snjofkalo.com</small>
+                    </div>
+                    <div>
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-3">
+            <div class="container">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a class="navbar-brand fw-bold fs-4" asp-page="/Home">
+                        <i class="fas fa-store text-primary me-2"></i>Snjofkalo
+                    </a>
+                }
+                else
+                {
+                    <a class="navbar-brand fw-bold fs-4" asp-page="/Index">
+                        <i class="fas fa-store text-primary me-2"></i>Snjofkalo
+                    </a>
+                }
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" asp-area="" asp-page="/Cart">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item ms-2">
+                                <a class="nav-link" asp-area="" asp-page="/Profile">
+                                    <i class="fas fa-user me-1"></i>Account
+                                </a>
+                            </li>
+                            <li class="nav-item ms-2" @(User.Identity.IsAuthenticated ? "" : "style=display:none;")>
+                                <form method="post" asp-page="/Logout" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+
+                        }
+                        else
+                        {
+                            <li class="nav-item ms-2">
+                                <a class="nav-link" asp-area="" asp-page="/Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -38,14 +90,13 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - OICAR_WebApp - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2025 - UI - <a asp-area="" asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
