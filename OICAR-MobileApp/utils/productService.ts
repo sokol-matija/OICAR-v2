@@ -37,17 +37,27 @@ export class ProductService {
 
       const data = await response.json();
       console.log(`✅ Loaded ${data.length} items`);
+      console.log('🔍 First item raw data:', JSON.stringify(data[0], null, 2));
       
-      // Convert backend naming to frontend naming
-      return data.map((item: any) => ({
-        idItem: item.IDItem,
-        itemCategoryID: item.ItemCategoryID,
-        title: item.Title,
-        description: item.Description,
-        stockQuantity: item.StockQuantity,
-        price: item.Price,
-        weight: item.Weight,
-      }));
+      // Convert backend naming to frontend naming with safety checks
+      return data.map((item: any, index: number) => {
+        const mappedItem = {
+          idItem: item.IDItem || item.idItem || item.Id || item.id,
+          itemCategoryID: item.ItemCategoryID || item.itemCategoryID || item.CategoryID || item.categoryId,
+          title: item.Title || item.title || 'Untitled Product',
+          description: item.Description || item.description || 'No description available',
+          stockQuantity: item.StockQuantity ?? item.stockQuantity ?? 0,
+          price: Number(item.Price ?? item.price ?? 0),
+          weight: Number(item.Weight ?? item.weight ?? 0),
+        };
+        
+        // Log any items with undefined IDs for debugging
+        if (!mappedItem.idItem) {
+          console.log(`⚠️ Item ${index} has undefined ID:`, JSON.stringify(item, null, 2));
+        }
+        
+        return mappedItem;
+      }).filter(item => item.idItem !== undefined && item.idItem !== null); // Filter out invalid items
     } catch (error) {
       console.log('💥 Get items exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to load items');

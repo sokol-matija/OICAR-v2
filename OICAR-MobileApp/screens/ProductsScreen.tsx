@@ -133,23 +133,23 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
   const renderProductItem = ({ item }: { item: ItemDTO }) => (
     <View style={styles.productCard}>
       <View style={styles.productHeader}>
-        <Text style={styles.productTitle}>{item.title}</Text>
-        <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+        <Text style={styles.productTitle}>{item.title || 'Untitled Product'}</Text>
+        <Text style={styles.productPrice}>${(item.price || 0).toFixed(2)}</Text>
       </View>
       
       <Text style={styles.productDescription} numberOfLines={2}>
-        {item.description}
+        {item.description || 'No description available'}
       </Text>
       
       <View style={styles.productFooter}>
         <Text style={styles.productCategory}>
-          {getCategoryName(item.itemCategoryID)}
+          {getCategoryName(item.itemCategoryID || 0)}
         </Text>
         <View style={styles.productMeta}>
-          <Text style={[styles.productStock, item.stockQuantity > 0 ? styles.inStock : styles.outOfStock]}>
-            {item.stockQuantity > 0 ? `${item.stockQuantity} in stock` : 'Out of stock'}
+          <Text style={[styles.productStock, (item.stockQuantity || 0) > 0 ? styles.inStock : styles.outOfStock]}>
+            {(item.stockQuantity || 0) > 0 ? `${item.stockQuantity} in stock` : 'Out of stock'}
           </Text>
-          <Text style={styles.productWeight}>{item.weight}kg</Text>
+          <Text style={styles.productWeight}>{(item.weight || 0).toFixed(1)}kg</Text>
         </View>
       </View>
     </View>
@@ -219,7 +219,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
         <FlatList
           data={filteredItems}
           renderItem={renderProductItem}
-          keyExtractor={(item) => `product-${item.idItem}`}
+          keyExtractor={(item, index) => `product-${item.idItem || `fallback-${index}`}`}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
