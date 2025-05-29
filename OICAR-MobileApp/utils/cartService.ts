@@ -206,4 +206,81 @@ export class CartService {
       throw new Error(error instanceof Error ? error.message : 'Failed to load cart');
     }
   }
+
+  static async removeCartItem(cartItemId: number, token: string): Promise<void> {
+    try {
+      const url = `${API_BASE_URL}/cartitem/${cartItemId}`;
+      console.log('🗑️ Removing cart item:', { url, cartItemId });
+      
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      console.log('📡 Remove cart item response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('❌ Remove cart item error:', errorText);
+        throw new Error(errorText || 'Failed to remove cart item');
+      }
+
+      console.log('✅ Cart item removed successfully');
+    } catch (error) {
+      console.log('💥 Remove cart item exception:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to remove cart item');
+    }
+  }
+
+  static async updateCartItemQuantity(cartItemId: number, quantity: number, token: string): Promise<void> {
+    try {
+      const url = `${API_BASE_URL}/cartitem/${cartItemId}`;
+      console.log('📝 Updating cart item quantity:', { url, cartItemId, quantity });
+      
+      // First get the current cart item to preserve other fields
+      const getResponse = await fetch(`${API_BASE_URL}/cartitem/${cartItemId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!getResponse.ok) {
+        throw new Error('Failed to get current cart item');
+      }
+
+      const currentItem = await getResponse.json();
+      
+      const updateData = {
+        IDCartItem: currentItem.idCartItem || currentItem.IDCartItem,
+        CartID: currentItem.cartID || currentItem.CartID,
+        ItemID: currentItem.itemID || currentItem.ItemID,
+        Quantity: quantity,
+      };
+      
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      console.log('📡 Update cart item response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('❌ Update cart item error:', errorText);
+        throw new Error(errorText || 'Failed to update cart item');
+      }
+
+      console.log('✅ Cart item quantity updated successfully');
+    } catch (error) {
+      console.log('💥 Update cart item exception:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to update cart item');
+    }
+  }
 } 

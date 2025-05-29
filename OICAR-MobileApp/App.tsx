@@ -8,6 +8,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
 import ProductsScreen from './screens/ProductsScreen';
 import CartScreen from './screens/CartScreen';
+import OrdersScreen from './screens/OrdersScreen';
 import BottomNavigation from './components/BottomNavigation';
 import TestComponent from './components/TestComponent';
 import { UserDTO } from './types/user';
@@ -144,16 +145,14 @@ export default function App() {
         );
       case 'cart':
         return (
-          <CartScreen token={authToken || undefined} />
+          <CartScreen 
+            token={authToken || undefined}
+            onNavigateToOrders={() => setCurrentScreen('orders')}
+          />
         );
       case 'orders':
         return (
-          <View style={styles.placeholderContainer}>
-            <View style={styles.placeholderCard}>
-              <Text style={styles.placeholderTitle}>📦 Orders</Text>
-              <Text style={styles.placeholderText}>Coming Soon!</Text>
-            </View>
-          </View>
+          <OrdersScreen token={authToken || undefined} />
         );
       default:
         return null;
