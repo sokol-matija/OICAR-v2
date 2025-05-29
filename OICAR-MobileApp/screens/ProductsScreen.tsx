@@ -212,7 +212,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
           horizontal
           data={categoryData}
           renderItem={renderCategoryButton}
-          keyExtractor={(item) => `category-${item.idItemCategory || 'all'}`}
+          keyExtractor={(item, index) => `category-${item.idItemCategory !== null ? item.idItemCategory : 'all-products'}-${index}`}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoriesContainer}
         />
