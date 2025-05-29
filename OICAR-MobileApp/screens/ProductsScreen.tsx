@@ -114,8 +114,14 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
   };
 
   const getCategoryName = (categoryId: number): string => {
+    console.log(`🔍 Looking for category ID: ${categoryId}`);
+    console.log(`📋 Available categories:`, categories.map(cat => ({ id: cat.idItemCategory, name: cat.categoryName })));
+    
     const category = categories.find(cat => cat.idItemCategory === categoryId);
-    return category ? category.categoryName : 'Unknown';
+    const result = category ? category.categoryName : 'Unknown';
+    
+    console.log(`📝 Category result for ID ${categoryId}: ${result}`);
+    return result;
   };
 
   const getSelectedCategoryName = (): string => {

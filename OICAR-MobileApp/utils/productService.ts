@@ -57,7 +57,7 @@ export class ProductService {
         }
         
         return mappedItem;
-      }).filter(item => item.idItem !== undefined && item.idItem !== null); // Filter out invalid items
+      }).filter((item: any) => item.idItem !== undefined && item.idItem !== null); // Filter out invalid items
     } catch (error) {
       console.log('💥 Get items exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to load items');
@@ -86,11 +86,12 @@ export class ProductService {
 
       const data = await response.json();
       console.log(`✅ Loaded ${data.length} categories`);
+      console.log('🔍 First category raw data:', JSON.stringify(data[0], null, 2));
       
       // Convert backend naming to frontend naming
       return data.map((category: any) => ({
-        idItemCategory: category.IDItemCategory,
-        categoryName: category.CategoryName,
+        idItemCategory: category.IDItemCategory || category.idItemCategory || category.Id || category.id,
+        categoryName: category.CategoryName || category.categoryName || category.Name || category.name,
       }));
     } catch (error) {
       console.log('💥 Get categories exception:', error);
