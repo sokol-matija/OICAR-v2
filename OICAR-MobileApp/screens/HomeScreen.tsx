@@ -1,14 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import CustomButton from '../components/CustomButton';
 
 interface HomeScreenProps {
   token?: string;
   onLogout?: () => void;
+  onNavigateToProfile?: () => void;
 }
 
-export default function HomeScreen({ token, onLogout }: HomeScreenProps) {
+export default function HomeScreen({ token, onLogout, onNavigateToProfile }: HomeScreenProps) {
   return (
     <SafeAreaView style={styles.container}>
       {/* Top Header Bar */}
@@ -33,42 +33,21 @@ export default function HomeScreen({ token, onLogout }: HomeScreenProps) {
           {/* Welcome Card */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>🎉 Welcome!</Text>
+              <Text style={styles.cardTitle}>🎉 Welcome to Snjofkalo!</Text>
             </View>
             
             <View style={styles.cardBody}>
               <Text style={styles.welcomeText}>
-                You have successfully logged in to the OICAR mobile application!
+                Your trusted online store for quality products. Browse our categories and find what you're looking for.
               </Text>
               
               <View style={styles.infoSection}>
-                <Text style={styles.sectionTitle}>Authentication Status:</Text>
-                <Text style={styles.statusText}>✅ Logged In</Text>
+                <Text style={styles.sectionTitle}>Quick Actions:</Text>
+                <Text style={styles.actionText}>🛍️ Browse Products</Text>
+                <Text style={styles.actionText}>🛒 View Cart</Text>
+                <Text style={styles.actionText}>📦 My Orders</Text>
+                <Text style={styles.actionText}>👤 My Profile</Text>
               </View>
-
-              {token && (
-                <View style={styles.infoSection}>
-                  <Text style={styles.sectionTitle}>Token Preview:</Text>
-                  <Text style={styles.tokenText} numberOfLines={3}>
-                    {token.substring(0, 50)}...
-                  </Text>
-                </View>
-              )}
-
-              <View style={styles.infoSection}>
-                <Text style={styles.sectionTitle}>Available Features:</Text>
-                <Text style={styles.featureText}>• User Authentication ✅</Text>
-                <Text style={styles.featureText}>• API Integration ✅</Text>
-                <Text style={styles.featureText}>• Form Validation ✅</Text>
-                <Text style={styles.featureText}>• Theme Matching ✅</Text>
-              </View>
-
-              <CustomButton
-                title="Logout"
-                variant="outline"
-                onPress={onLogout}
-                style={styles.logoutButton}
-              />
             </View>
           </View>
         </View>
@@ -118,6 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
     paddingVertical: 32,
+    paddingBottom: 100, // Space for bottom navigation
   },
   contentContainer: {
     alignItems: 'center',
@@ -137,7 +117,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   cardHeader: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#007bff',
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderTopLeftRadius: 12,
@@ -146,7 +126,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: '#ffffff',
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   cardBody: {
@@ -166,29 +146,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#343a40',
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  statusText: {
+  actionText: {
     fontSize: 16,
-    color: '#28a745',
-    fontWeight: '500',
-  },
-  tokenText: {
-    fontSize: 12,
-    color: '#6c757d',
-    fontFamily: 'monospace',
-    backgroundColor: '#f8f9fa',
-    padding: 8,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#dee2e6',
-  },
-  featureText: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginBottom: 4,
-  },
-  logoutButton: {
-    marginTop: 20,
+    color: '#007bff',
+    marginBottom: 8,
+    textAlign: 'center',
   },
 }); 
