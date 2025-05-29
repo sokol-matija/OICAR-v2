@@ -6,6 +6,7 @@ import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
+import ProductsScreen from './screens/ProductsScreen';
 import BottomNavigation from './components/BottomNavigation';
 import TestComponent from './components/TestComponent';
 import { UserDTO } from './types/user';
@@ -138,12 +139,7 @@ export default function App() {
         ) : null;
       case 'products':
         return (
-          <View style={styles.placeholderContainer}>
-            <View style={styles.placeholderCard}>
-              <Text style={styles.placeholderTitle}>🛍️ Products</Text>
-              <Text style={styles.placeholderText}>Coming Soon!</Text>
-            </View>
-          </View>
+          <ProductsScreen />
         );
       case 'cart':
         return (

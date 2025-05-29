@@ -19,7 +19,7 @@ import { ProductService } from '../utils/productService';
 const { width } = Dimensions.get('window');
 
 interface ProductsScreenProps {
-  navigation: any;
+  navigation?: any;
 }
 
 const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
