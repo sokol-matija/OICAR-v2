@@ -15,15 +15,19 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ItemDTO, ItemCategoryDTO } from '../types/product';
+import { CartDTO } from '../types/cart';
 import { ProductService } from '../utils/productService';
+import { CartService } from '../utils/cartService';
+import { JWTUtils } from '../utils/jwtUtils';
 
 const { width } = Dimensions.get('window');
 
 interface ProductsScreenProps {
   navigation?: any;
+  token?: string;
 }
 
-const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
+const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) => {
   const [items, setItems] = useState<ItemDTO[]>([]);
   const [categories, setCategories] = useState<ItemCategoryDTO[]>([]);
   const [filteredItems, setFilteredItems] = useState<ItemDTO[]>([]);
@@ -33,6 +37,8 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [cart, setCart] = useState<CartDTO | null>(null);
+  const [addingToCart, setAddingToCart] = useState<number | null>(null);
 
   useEffect(() => {
     loadData();
@@ -41,6 +47,12 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
   useEffect(() => {
     filterItems();
   }, [items, selectedCategory, searchQuery]);
+
+  useEffect(() => {
+    if (token) {
+      loadUserCart();
+    }
+  }, [token]);
 
   const loadData = async () => {
     try {
@@ -136,6 +148,78 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
     loadData();
   };
 
+  const loadUserCart = async () => {
+    if (!token) return;
+
+    try {
+      const userId = JWTUtils.parseToken(token)?.id;
+      if (!userId) return;
+
+      console.log('🔄 Loading user cart...');
+      let userCart = await CartService.getUserCart(parseInt(userId), token);
+      
+      if (!userCart) {
+        // Create a new cart if none exists
+        userCart = await CartService.createCart(parseInt(userId), token);
+      }
+      
+      setCart(userCart);
+      console.log('✅ Cart loaded successfully');
+    } catch (error) {
+      console.log('❌ Failed to load cart:', error);
+      // Don't show alert for cart loading errors - cart functionality is optional
+    }
+  };
+
+  const handleAddToCart = async (item: ItemDTO) => {
+    if (!token) {
+      Alert.alert('Authentication Required', 'Please log in to add items to cart');
+      return;
+    }
+
+    if (item.stockQuantity <= 0) {
+      Alert.alert('Out of Stock', 'This item is currently out of stock');
+      return;
+    }
+
+    setAddingToCart(item.idItem);
+
+    try {
+      const userId = JWTUtils.parseToken(token)?.id;
+      if (!userId) {
+        Alert.alert('Error', 'Invalid authentication token');
+        return;
+      }
+
+      let currentCart = cart;
+      if (!currentCart) {
+        currentCart = await CartService.createCart(parseInt(userId), token);
+        setCart(currentCart);
+      }
+
+      await CartService.addItemToCart(currentCart.idCart, item.idItem, 1, token);
+      
+      // Update local stock count (optimistic update)
+      setItems(prevItems => 
+        prevItems.map(prevItem => 
+          prevItem.idItem === item.idItem 
+            ? { ...prevItem, stockQuantity: prevItem.stockQuantity - 1 }
+            : prevItem
+        )
+      );
+
+      // Reload cart to get updated state
+      await loadUserCart();
+
+      Alert.alert('Success', `${item.title} added to cart!`);
+    } catch (error) {
+      console.log('❌ Add to cart failed:', error);
+      Alert.alert('Error', 'Failed to add item to cart. Please try again.');
+    } finally {
+      setAddingToCart(null);
+    }
+  };
+
   const renderProductItem = ({ item }: { item: ItemDTO }) => (
     <View style={styles.productCard}>
       <View style={styles.productHeader}>
@@ -148,15 +232,36 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
       </Text>
       
       <View style={styles.productFooter}>
-        <Text style={styles.productCategory}>
-          {getCategoryName(item.itemCategoryID || 0)}
-        </Text>
-        <View style={styles.productMeta}>
-          <Text style={[styles.productStock, (item.stockQuantity || 0) > 0 ? styles.inStock : styles.outOfStock]}>
-            {(item.stockQuantity || 0) > 0 ? `${item.stockQuantity} in stock` : 'Out of stock'}
+        <View style={styles.productInfo}>
+          <Text style={styles.productCategory}>
+            {getCategoryName(item.itemCategoryID || 0)}
           </Text>
-          <Text style={styles.productWeight}>{(item.weight || 0).toFixed(1)}kg</Text>
+          <View style={styles.productMeta}>
+            <Text style={[styles.productStock, (item.stockQuantity || 0) > 0 ? styles.inStock : styles.outOfStock]}>
+              {(item.stockQuantity || 0) > 0 ? `${item.stockQuantity} in stock` : 'Out of stock'}
+            </Text>
+            <Text style={styles.productWeight}>{(item.weight || 0).toFixed(1)}kg</Text>
+          </View>
         </View>
+        
+        <TouchableOpacity
+          style={[
+            styles.addToCartButton,
+            (item.stockQuantity || 0) <= 0 && styles.addToCartButtonDisabled,
+            addingToCart === item.idItem && styles.addToCartButtonLoading
+          ]}
+          onPress={() => handleAddToCart(item)}
+          disabled={(item.stockQuantity || 0) <= 0 || addingToCart === item.idItem}
+        >
+          {addingToCart === item.idItem ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <>
+              <Ionicons name="cart" size={16} color="white" style={styles.cartIcon} />
+              <Text style={styles.addToCartText}>Add to Cart</Text>
+            </>
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -467,6 +572,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-end',
   },
+  productInfo: {
+    flex: 1,
+  },
   productCategory: {
     fontSize: 12,
     color: '#007bff',
@@ -490,6 +598,27 @@ const styles = StyleSheet.create({
   productWeight: {
     fontSize: 11,
     color: '#666',
+  },
+  addToCartButton: {
+    backgroundColor: '#007bff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  addToCartButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  addToCartButtonLoading: {
+    backgroundColor: '#007bff',
+  },
+  cartIcon: {
+    marginRight: 8,
+  },
+  addToCartText: {
+    color: 'white',
+    fontWeight: '600',
   },
   emptyContainer: {
     alignItems: 'center',

@@ -139,7 +139,7 @@ export default function App() {
         ) : null;
       case 'products':
         return (
-          <ProductsScreen />
+          <ProductsScreen token={authToken || undefined} />
         );
       case 'cart':
         return (
