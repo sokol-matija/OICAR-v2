@@ -7,32 +7,43 @@ import {
   TouchableOpacity, 
   ActivityIndicator, 
   Alert,
-  RefreshControl 
+  RefreshControl,
+  Modal 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { OrderDTO, StatusDTO } from '../types/order';
 import { OrderService } from '../utils/orderService';
 import { JWTUtils } from '../utils/jwtUtils';
+import OrderDetailsScreen from './OrderDetailsScreen';
 
 interface OrdersScreenProps {
   token?: string;
+  onReorderItems?: (orderItems: any[]) => void;
 }
 
 interface OrderWithStatus extends OrderDTO {
   status?: StatusDTO;
 }
 
-const OrdersScreen: React.FC<OrdersScreenProps> = ({ token }) => {
+const OrdersScreen: React.FC<OrdersScreenProps> = ({ token, onReorderItems }) => {
   const [orders, setOrders] = useState<OrderWithStatus[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<OrderWithStatus[]>([]);
   const [statuses, setStatuses] = useState<StatusDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
 
   useEffect(() => {
     if (token) {
       loadOrders();
     }
   }, [token]);
+
+  useEffect(() => {
+    applyFiltersAndSorting();
+  }, [orders, filterStatus, sortBy]);
 
   const loadOrders = async () => {
     if (!token) {
@@ -68,6 +79,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token }) => {
       }));
 
       console.log('✅ Loaded orders with status:', JSON.stringify(ordersWithStatus, null, 2));
+      console.log('🔍 Order totalAmounts:', ordersWithStatus.map(o => ({ id: o.idOrder, total: o.totalAmount })));
       setOrders(ordersWithStatus);
       
     } catch (error) {
@@ -79,6 +91,28 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyFiltersAndSorting = () => {
+    let filtered = [...orders];
+
+    // Apply status filter
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(order => 
+        order.status?.name?.toLowerCase() === filterStatus.toLowerCase()
+      );
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
+      } else {
+        return (b.totalAmount || 0) - (a.totalAmount || 0);
+      }
+    });
+
+    setFilteredOrders(filtered);
   };
 
   const onRefresh = () => {
@@ -121,8 +155,8 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token }) => {
     <TouchableOpacity 
       style={styles.orderCard}
       onPress={() => {
-        // TODO: Navigate to order details screen
-        Alert.alert('Order Details', `Order #${item.idOrder} details coming soon!`);
+        console.log('🔍 Order item clicked:', { id: item.idOrder, total: item.totalAmount });
+        setSelectedOrderId(item.idOrder);
       }}
     >
       <View style={styles.orderHeader}>
@@ -171,7 +205,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token }) => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Orders</Text>
         <Text style={styles.orderCount}>
-          {orders.length} {orders.length === 1 ? 'order' : 'orders'}
+          {filteredOrders.length} {filteredOrders.length === 1 ? 'order' : 'orders'}
         </Text>
       </View>
 
@@ -181,9 +215,15 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token }) => {
           <Text style={styles.emptyText}>No orders yet</Text>
           <Text style={styles.emptySubtext}>Your order history will appear here</Text>
         </View>
+      ) : filteredOrders.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="filter-outline" size={64} color="#ccc" />
+          <Text style={styles.emptyText}>No orders found</Text>
+          <Text style={styles.emptySubtext}>Try adjusting your filters</Text>
+        </View>
       ) : (
         <FlatList
-          data={orders}
+          data={filteredOrders}
           renderItem={renderOrderItem}
           keyExtractor={(item) => `order-${item.idOrder}`}
           showsVerticalScrollIndicator={false}
@@ -192,6 +232,21 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token }) => {
           }
           contentContainerStyle={styles.ordersList}
         />
+      )}
+
+      {selectedOrderId && (
+        <Modal
+          visible={true}
+          animationType="slide"
+          presentationStyle="pageSheet"
+        >
+          <OrderDetailsScreen
+            orderId={selectedOrderId}
+            token={token}
+            onBack={() => setSelectedOrderId(null)}
+            onReorder={onReorderItems}
+          />
+        </Modal>
       )}
     </View>
   );

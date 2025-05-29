@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import { OrderDTO, OrderItemDTO, StatusDTO, CreateOrderRequest, CreateOrderItemRequest } from '../types/order';
 import { CartDTO, CartItemDTO } from '../types/cart';
+import { ProductService } from './productService';
 
 // Use different URLs for different platforms
 const getApiBaseUrl = () => {
@@ -106,14 +107,31 @@ export class OrderService {
     try {
       console.log('🛒 Creating order from cart:', JSON.stringify(cart, null, 2));
       
-      // Calculate total amount
-      const totalAmount = 0; // We'll calculate this properly after getting product prices
+      // Calculate total amount from cart items
+      console.log('💰 Calculating total amount from cart items...');
+      let totalAmount = 0;
+      
+      // Get product details to calculate accurate total
+      const products = await ProductService.getAllItems();
+      
+      for (const cartItem of cart.cartItems) {
+        const product = products.find(p => p.idItem === cartItem.itemID);
+        if (product) {
+          const itemTotal = product.price * cartItem.quantity;
+          totalAmount += itemTotal;
+          console.log(`💰 Item ${product.title}: $${product.price} × ${cartItem.quantity} = $${itemTotal}`);
+        } else {
+          console.log(`⚠️ Product not found for item ID: ${cartItem.itemID}`);
+        }
+      }
+      
+      console.log(`💰 Total calculated amount: $${totalAmount}`);
       
       // First create the order - include all fields that match OrderDTO
       const orderData = {
         IDOrder: 0, // Backend will generate the real ID
         UserID: userId,
-        StatusID: 1, // Assuming 1 is "Completed" status - we'll fix this later
+        StatusID: 1, // Assuming 1 is "Pending" status
         OrderDate: new Date().toISOString(),
         TotalAmount: totalAmount,
       };

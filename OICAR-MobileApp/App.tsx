@@ -12,6 +12,9 @@ import OrdersScreen from './screens/OrdersScreen';
 import BottomNavigation from './components/BottomNavigation';
 import TestComponent from './components/TestComponent';
 import { UserDTO } from './types/user';
+import { CartService } from './utils/cartService';
+import { JWTUtils } from './utils/jwtUtils';
+import { Alert } from 'react-native';
 
 type Screen = 'test' | 'login' | 'register' | 'home' | 'profile' | 'editProfile' | 'products' | 'cart' | 'orders';
 
@@ -56,6 +59,63 @@ export default function App() {
 
   const handleBackToHome = () => {
     setCurrentScreen('home');
+  };
+
+  const handleReorderItems = async (orderItems: any[]) => {
+    if (!authToken) {
+      Alert.alert('Authentication Required', 'Please log in to add items to cart');
+      return;
+    }
+
+    try {
+      console.log('🔄 Reordering items:', orderItems);
+      
+      // Get user ID from token
+      const parsed = JWTUtils.parseToken(authToken);
+      const userId = parsed?.id;
+      
+      if (!userId) {
+        Alert.alert('Error', 'Could not verify user identity');
+        return;
+      }
+
+      // Get or create user cart
+      let userCart = await CartService.getUserCart(parseInt(userId), authToken);
+      if (!userCart) {
+        userCart = await CartService.createCart(parseInt(userId), authToken);
+      }
+
+      // Add each order item to cart
+      for (const orderItem of orderItems) {
+        if (orderItem.product && orderItem.quantity > 0) {
+          await CartService.addItemToCart(
+            userCart.idCart,
+            orderItem.itemID,
+            orderItem.quantity,
+            authToken
+          );
+        }
+      }
+
+      Alert.alert(
+        'Items Added! 🛒',
+        `${orderItems.length} items have been added to your cart.`,
+        [
+          {
+            text: 'View Cart',
+            onPress: () => setCurrentScreen('cart')
+          },
+          {
+            text: 'Continue Shopping',
+            style: 'cancel'
+          }
+        ]
+      );
+
+    } catch (error) {
+      console.log('💥 Reorder error:', error);
+      Alert.alert('Error', 'Failed to add items to cart. Please try again.');
+    }
   };
 
   // Navigation items for bottom navigation
@@ -152,7 +212,10 @@ export default function App() {
         );
       case 'orders':
         return (
-          <OrdersScreen token={authToken || undefined} />
+          <OrdersScreen 
+            token={authToken || undefined}
+            onReorderItems={handleReorderItems}
+          />
         );
       default:
         return null;
