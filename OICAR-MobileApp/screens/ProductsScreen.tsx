@@ -10,7 +10,8 @@ import {
   RefreshControl,
   Alert,
   FlatList,
-  Dimensions 
+  Dimensions,
+  Modal 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ItemDTO, ItemCategoryDTO } from '../types/product';
@@ -31,6 +32,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -107,6 +109,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
 
   const handleCategorySelect = (categoryId: number | null) => {
     setSelectedCategory(categoryId);
+    setShowCategoryDropdown(false);
     setSearchQuery(''); // Clear search when changing category
   };
 
@@ -115,29 +118,17 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
     return category ? category.categoryName : 'Unknown';
   };
 
+  const getSelectedCategoryName = (): string => {
+    if (selectedCategory === null) return 'All Products';
+    return getCategoryName(selectedCategory);
+  };
+
   const onRefresh = () => {
     setRefreshing(true);
     setSelectedCategory(null);
     setSearchQuery('');
     loadData();
   };
-
-  const renderCategoryButton = ({ item }: { item: ItemCategoryDTO | { idItemCategory: null, categoryName: string } }) => (
-    <TouchableOpacity
-      style={[
-        styles.categoryButton,
-        selectedCategory === item.idItemCategory && styles.selectedCategoryButton
-      ]}
-      onPress={() => handleCategorySelect(item.idItemCategory)}
-    >
-      <Text style={[
-        styles.categoryButtonText,
-        selectedCategory === item.idItemCategory && styles.selectedCategoryButtonText
-      ]}>
-        {item.categoryName}
-      </Text>
-    </TouchableOpacity>
-  );
 
   const renderProductItem = ({ item }: { item: ItemDTO }) => (
     <View style={styles.productCard}>
@@ -173,11 +164,6 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
     );
   }
 
-  const categoryData = [
-    { idItemCategory: null, categoryName: 'All Products' },
-    ...categories
-  ];
-
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -206,16 +192,18 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Categories */}
-      <View style={styles.categoriesSection}>
-        <FlatList
-          horizontal
-          data={categoryData}
-          renderItem={renderCategoryButton}
-          keyExtractor={(item, index) => `category-${item.idItemCategory !== null ? item.idItemCategory : 'all-products'}-${index}`}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesContainer}
-        />
+      {/* Category Filter */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity 
+          style={styles.categorySelector}
+          onPress={() => setShowCategoryDropdown(true)}
+        >
+          <View style={styles.categorySelectorContent}>
+            <Ionicons name="filter" size={20} color="#007bff" />
+            <Text style={styles.categorySelectorText}>{getSelectedCategoryName()}</Text>
+            <Ionicons name="chevron-down" size={20} color="#007bff" />
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* Products List */}
@@ -254,6 +242,70 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation }) => {
           }
         />
       </View>
+
+      {/* Category Dropdown Modal */}
+      <Modal
+        visible={showCategoryDropdown}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowCategoryDropdown(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowCategoryDropdown(false)}
+        >
+          <View style={styles.dropdownContainer}>
+            <View style={styles.dropdownHeader}>
+              <Text style={styles.dropdownTitle}>Select Category</Text>
+              <TouchableOpacity onPress={() => setShowCategoryDropdown(false)}>
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.dropdownList}>
+              <TouchableOpacity
+                style={[
+                  styles.dropdownItem,
+                  selectedCategory === null && styles.dropdownItemSelected
+                ]}
+                onPress={() => handleCategorySelect(null)}
+              >
+                <Text style={[
+                  styles.dropdownItemText,
+                  selectedCategory === null && styles.dropdownItemTextSelected
+                ]}>
+                  All Products
+                </Text>
+                {selectedCategory === null && (
+                  <Ionicons name="checkmark" size={20} color="#007bff" />
+                )}
+              </TouchableOpacity>
+              
+              {categories.map((category) => (
+                <TouchableOpacity
+                  key={category.idItemCategory}
+                  style={[
+                    styles.dropdownItem,
+                    selectedCategory === category.idItemCategory && styles.dropdownItemSelected
+                  ]}
+                  onPress={() => handleCategorySelect(category.idItemCategory)}
+                >
+                  <Text style={[
+                    styles.dropdownItemText,
+                    selectedCategory === category.idItemCategory && styles.dropdownItemTextSelected
+                  ]}>
+                    {category.categoryName}
+                  </Text>
+                  {selectedCategory === category.idItemCategory && (
+                    <Ionicons name="checkmark" size={20} color="#007bff" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -324,35 +376,23 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
   },
-  categoriesSection: {
+  filterContainer: {
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
   },
-  categoriesContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  categorySelector: {
+    padding: 16,
   },
-  categoryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 8,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#dee2e6',
+  categorySelectorContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  selectedCategoryButton: {
-    backgroundColor: '#007bff',
-    borderColor: '#007bff',
-  },
-  categoryButtonText: {
+  categorySelectorText: {
+    flex: 1,
     fontSize: 14,
     fontWeight: '500',
     color: '#495057',
-  },
-  selectedCategoryButtonText: {
-    color: 'white',
   },
   productsSection: {
     flex: 1,
@@ -466,6 +506,49 @@ const styles = StyleSheet.create({
   clearButtonText: {
     color: 'white',
     fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dropdownContainer: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 16,
+    width: width * 0.8,
+  },
+  dropdownHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  dropdownTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#212529',
+  },
+  dropdownList: {
+    maxHeight: 200,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 12,
+  },
+  dropdownItemSelected: {
+    backgroundColor: '#f8f9fa',
+  },
+  dropdownItemText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#495057',
+  },
+  dropdownItemTextSelected: {
+    color: '#007bff',
   },
 });
 
