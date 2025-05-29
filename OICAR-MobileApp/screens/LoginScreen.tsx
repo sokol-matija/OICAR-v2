@@ -70,6 +70,15 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
     }
   };
 
+  const fillTestCredentials = () => {
+    setFormData({
+      email: 'a@gmail.com',
+      password: '123456',
+    });
+    // Clear any existing errors
+    setErrors({});
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Top Header Bar */}
@@ -126,6 +135,13 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
                 onPress={handleLogin}
                 style={styles.loginButton}
               />
+
+              <TouchableOpacity
+                style={styles.testButton}
+                onPress={fillTestCredentials}
+              >
+                <Text style={styles.testButtonText}>🧪 Fill Test Credentials</Text>
+              </TouchableOpacity>
             </View>
 
             {/* Card Footer */}
@@ -242,6 +258,21 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: '#007bff',
+    fontWeight: '500',
+  },
+  testButton: {
+    marginTop: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#f8f9fa',
+    borderWidth: 1,
+    borderColor: '#6c757d',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  testButtonText: {
+    color: '#6c757d',
+    fontSize: 14,
     fontWeight: '500',
   },
 }); 

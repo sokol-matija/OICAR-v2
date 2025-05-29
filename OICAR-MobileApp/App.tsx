@@ -7,6 +7,7 @@ import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
 import ProductsScreen from './screens/ProductsScreen';
+import CartScreen from './screens/CartScreen';
 import BottomNavigation from './components/BottomNavigation';
 import TestComponent from './components/TestComponent';
 import { UserDTO } from './types/user';
@@ -143,12 +144,7 @@ export default function App() {
         );
       case 'cart':
         return (
-          <View style={styles.placeholderContainer}>
-            <View style={styles.placeholderCard}>
-              <Text style={styles.placeholderTitle}>🛒 Cart</Text>
-              <Text style={styles.placeholderText}>Coming Soon!</Text>
-            </View>
-          </View>
+          <CartScreen token={authToken || undefined} />
         );
       case 'orders':
         return (

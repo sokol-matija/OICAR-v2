@@ -19,6 +19,7 @@ export class CartService {
     try {
       const url = `${API_BASE_URL}/cart/users/${userId}`;
       console.log('🔍 Get user cart:', { url, userId });
+      console.log('🔍 Token for get cart:', token ? 'Present' : 'Missing');
       
       const response = await fetch(url, {
         method: 'GET',
@@ -32,7 +33,7 @@ export class CartService {
 
       if (response.status === 404) {
         // No cart exists yet, return null
-        console.log('ℹ️ No cart found for user');
+        console.log('ℹ️ No cart found for user (404 response)');
         return null;
       }
 
@@ -43,19 +44,24 @@ export class CartService {
       }
 
       const data = await response.json();
-      console.log(`✅ Loaded cart with ${data.CartItems?.length || 0} items`);
+      console.log(`✅ Loaded cart response:`, JSON.stringify(data, null, 2));
       
       // Convert backend naming to frontend naming
-      return {
-        idCart: data.IDCart,
-        userID: data.UserID,
-        cartItems: (data.CartItems || []).map((item: any) => ({
-          idCartItem: item.IDCartItem,
-          itemID: item.ItemID,
-          cartID: item.CartID,
-          quantity: item.Quantity,
+      const cartDTO = {
+        idCart: data.idCart || data.IDCart,
+        userID: data.userID || data.UserID,
+        cartItems: (data.cartItems || data.CartItems || []).map((item: any) => ({
+          idCartItem: item.idCartItem || item.IDCartItem,
+          itemID: item.itemID || item.ItemID,
+          cartID: item.cartID || item.CartID,
+          quantity: item.quantity || item.Quantity,
         })),
       };
+      
+      console.log(`✅ Converted cart DTO:`, JSON.stringify(cartDTO, null, 2));
+      console.log(`✅ Loaded cart with ${cartDTO.cartItems?.length || 0} items`);
+      
+      return cartDTO;
     } catch (error) {
       console.log('💥 Get cart exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to load cart');
@@ -71,6 +77,8 @@ export class CartService {
         UserID: userId,
         CartItems: []
       };
+      
+      console.log('📦 Cart creation payload:', JSON.stringify(cartData, null, 2));
       
       const response = await fetch(url, {
         method: 'POST',
@@ -90,14 +98,23 @@ export class CartService {
       }
 
       const data = await response.json();
-      console.log('✅ Created new cart:', data);
+      console.log('✅ Created new cart response:', JSON.stringify(data, null, 2));
       
       // Convert backend naming to frontend naming
-      return {
-        idCart: data.IDCart,
-        userID: data.UserID,
+      const cartDTO = {
+        idCart: data.idCart || data.IDCart,
+        userID: data.userID || data.UserID,
         cartItems: [],
       };
+      
+      console.log('✅ Converted cart DTO:', JSON.stringify(cartDTO, null, 2));
+      
+      if (!cartDTO.idCart || cartDTO.idCart <= 0) {
+        console.log('❌ Cart creation returned invalid ID:', cartDTO.idCart);
+        throw new Error('Cart creation failed - invalid cart ID returned');
+      }
+      
+      return cartDTO;
     } catch (error) {
       console.log('💥 Create cart exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to create cart');
@@ -106,67 +123,47 @@ export class CartService {
 
   static async addItemToCart(cartId: number, itemId: number, quantity: number, token: string): Promise<void> {
     try {
-      // For simplicity, we'll update the entire cart
-      // In a real app, you might have a specific endpoint for adding items
-      const url = `${API_BASE_URL}/cart/${cartId}`;
+      // Use the CartItem endpoint to add items directly
+      const url = `${API_BASE_URL}/cartitem`;
       console.log('🔍 Add item to cart:', { url, cartId, itemId, quantity });
+      console.log('🔍 Token for request:', token ? 'Present' : 'Missing');
       
-      // First, get the current cart
-      const currentCart = await this.getCartById(cartId, token);
-      if (!currentCart) {
-        throw new Error('Cart not found');
-      }
-
-      // Check if item already exists in cart
-      const existingItemIndex = currentCart.cartItems.findIndex(item => item.itemID === itemId);
-      
-      let updatedCartItems;
-      if (existingItemIndex >= 0) {
-        // Update existing item quantity
-        updatedCartItems = [...currentCart.cartItems];
-        updatedCartItems[existingItemIndex].quantity += quantity;
-      } else {
-        // Add new item to cart
-        const newCartItem = {
-          IDCartItem: 0, // Will be set by backend
-          ItemID: itemId,
-          CartID: cartId,
-          Quantity: quantity,
-        };
-        updatedCartItems = [...currentCart.cartItems.map(item => ({
-          IDCartItem: item.idCartItem,
-          ItemID: item.itemID,
-          CartID: item.cartID,
-          Quantity: item.quantity,
-        })), newCartItem];
-      }
-
-      const cartUpdateData = {
-        IDCart: currentCart.idCart,
-        UserID: currentCart.userID,
-        CartItems: updatedCartItems,
+      // Create cart item data (no IDCartItem for new items)
+      const cartItemData = {
+        CartID: cartId,
+        ItemID: itemId,
+        Quantity: quantity,
       };
       
+      console.log('📦 Cart item data:', JSON.stringify(cartItemData, null, 2));
+      
       const response = await fetch(url, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(cartUpdateData),
+        body: JSON.stringify(cartItemData),
       });
 
       console.log('📡 Add item response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Add item error:', errorText);
+        console.log('❌ Add item error response:', errorText);
         throw new Error(errorText || 'Failed to add item to cart');
       }
 
+      const responseData = await response.json();
+      console.log('✅ Add item success response:', JSON.stringify(responseData, null, 2));
       console.log('✅ Item added to cart successfully');
     } catch (error) {
       console.log('💥 Add item exception:', error);
+      console.log('💥 Exception type:', typeof error);
+      console.log('💥 Exception message:', error instanceof Error ? error.message : 'Unknown error');
+      if (error instanceof Error && error.stack) {
+        console.log('💥 Exception stack:', error.stack);
+      }
       throw new Error(error instanceof Error ? error.message : 'Failed to add item to cart');
     }
   }
@@ -196,13 +193,13 @@ export class CartService {
       
       // Convert backend naming to frontend naming
       return {
-        idCart: data.IDCart,
-        userID: data.UserID,
-        cartItems: (data.CartItems || []).map((item: any) => ({
-          idCartItem: item.IDCartItem,
-          itemID: item.ItemID,
-          cartID: item.CartID,
-          quantity: item.Quantity,
+        idCart: data.idCart || data.IDCart,
+        userID: data.userID || data.UserID,
+        cartItems: (data.cartItems || data.CartItems || []).map((item: any) => ({
+          idCartItem: item.idCartItem || item.IDCartItem,
+          itemID: item.itemID || item.ItemID,
+          cartID: item.cartID || item.CartID,
+          quantity: item.quantity || item.Quantity,
         })),
       };
     } catch (error) {

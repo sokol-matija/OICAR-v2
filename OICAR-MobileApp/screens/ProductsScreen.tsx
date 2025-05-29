@@ -172,34 +172,68 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
   };
 
   const handleAddToCart = async (item: ItemDTO) => {
+    console.log('🛒 === ADD TO CART DEBUG START ===');
+    console.log('🛒 Item to add:', JSON.stringify(item, null, 2));
+    console.log('🛒 Token available:', !!token);
+    console.log('🛒 Item stock:', item.stockQuantity);
+    
     if (!token) {
+      console.log('❌ No token available');
       Alert.alert('Authentication Required', 'Please log in to add items to cart');
       return;
     }
 
     if (item.stockQuantity <= 0) {
+      console.log('❌ Item out of stock');
       Alert.alert('Out of Stock', 'This item is currently out of stock');
       return;
     }
 
     setAddingToCart(item.idItem);
+    console.log('🛒 Set adding to cart for item:', item.idItem);
 
     try {
-      const userId = JWTUtils.parseToken(token)?.id;
+      console.log('🛒 Parsing JWT token...');
+      const tokenPayload = JWTUtils.parseToken(token);
+      console.log('🛒 JWT Payload:', JSON.stringify(tokenPayload, null, 2));
+      
+      const userId = tokenPayload?.id;
+      console.log('🛒 Extracted user ID:', userId);
+      
       if (!userId) {
+        console.log('❌ No user ID in token');
         Alert.alert('Error', 'Invalid authentication token');
         return;
       }
 
+      console.log('🛒 Current cart state:', JSON.stringify(cart, null, 2));
+      
       let currentCart = cart;
       if (!currentCart) {
+        console.log('🛒 No cart exists, creating new cart...');
         currentCart = await CartService.createCart(parseInt(userId), token);
+        console.log('🛒 Created cart:', JSON.stringify(currentCart, null, 2));
         setCart(currentCart);
       }
 
+      console.log('🛒 Final cart to use:', JSON.stringify(currentCart, null, 2));
+      console.log('🛒 Cart ID for adding item:', currentCart.idCart);
+
+      if (!currentCart.idCart || currentCart.idCart <= 0) {
+        console.log('❌ Invalid cart ID:', currentCart.idCart);
+        throw new Error('Invalid cart ID - cart creation may have failed');
+      }
+
+      console.log('🛒 Adding item to cart...');
+      console.log('🛒 Cart ID:', currentCart.idCart);
+      console.log('🛒 Item ID:', item.idItem);
+      console.log('🛒 Quantity:', 1);
+      
       await CartService.addItemToCart(currentCart.idCart, item.idItem, 1, token);
+      console.log('✅ Item added successfully');
       
       // Update local stock count (optimistic update)
+      console.log('🛒 Updating local stock...');
       setItems(prevItems => 
         prevItems.map(prevItem => 
           prevItem.idItem === item.idItem 
@@ -209,14 +243,18 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       );
 
       // Reload cart to get updated state
+      console.log('🛒 Reloading cart...');
       await loadUserCart();
 
+      console.log('✅ ADD TO CART COMPLETE');
       Alert.alert('Success', `${item.title} added to cart!`);
     } catch (error) {
-      console.log('❌ Add to cart failed:', error);
-      Alert.alert('Error', 'Failed to add item to cart. Please try again.');
+      console.log('💥 ADD TO CART ERROR:', error);
+      console.log('💥 Error details:', JSON.stringify(error, null, 2));
+      Alert.alert('Error', `Failed to add item to cart: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setAddingToCart(null);
+      console.log('🛒 === ADD TO CART DEBUG END ===');
     }
   };
 
