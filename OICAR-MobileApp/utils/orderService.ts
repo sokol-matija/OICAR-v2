@@ -107,12 +107,27 @@ export class OrderService {
     try {
       console.log('🛒 Creating order from cart:', JSON.stringify(cart, null, 2));
       
+      // Get product details to calculate accurate total
+      const products = await ProductService.getAllItems();
+      
+      // Validate stock availability before proceeding
+      console.log('📦 Validating stock availability...');
+      for (const cartItem of cart.cartItems) {
+        const product = products.find(p => p.idItem === cartItem.itemID);
+        if (!product) {
+          throw new Error(`Product not found for item ID: ${cartItem.itemID}`);
+        }
+        
+        if (product.stockQuantity < cartItem.quantity) {
+          throw new Error(`Insufficient stock for ${product.title}. Available: ${product.stockQuantity}, Requested: ${cartItem.quantity}`);
+        }
+        
+        console.log(`✅ Stock check passed for ${product.title}: ${cartItem.quantity} requested, ${product.stockQuantity} available`);
+      }
+      
       // Calculate total amount from cart items
       console.log('💰 Calculating total amount from cart items...');
       let totalAmount = 0;
-      
-      // Get product details to calculate accurate total
-      const products = await ProductService.getAllItems();
       
       for (const cartItem of cart.cartItems) {
         const product = products.find(p => p.idItem === cartItem.itemID);
@@ -208,6 +223,10 @@ export class OrderService {
 
         const orderItemResult = await orderItemResponse.json();
         console.log('✅ Created order item:', JSON.stringify(orderItemResult, null, 2));
+
+        // Update stock quantity - reduce by purchased amount
+        console.log(`📦 Updating stock for item ${cartItem.itemID}, reducing by ${cartItem.quantity}`);
+        await this.updateItemStock(cartItem.itemID, cartItem.quantity, token);
       }
 
       console.log('✅ Order created successfully with all items');
@@ -301,6 +320,137 @@ export class OrderService {
     } catch (error) {
       console.log('💥 Get statuses exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to load statuses');
+    }
+  }
+
+  static async updateItemStock(itemId: number, purchasedQuantity: number, token: string): Promise<void> {
+    try {
+      console.log(`📦 Reducing stock for item ${itemId} by ${purchasedQuantity} units`);
+      
+      // First get the current item details including stock
+      const currentItem = await this.getItemById(itemId, token);
+      
+      if (!currentItem) {
+        console.log(`❌ Item ${itemId} not found, cannot update stock`);
+        throw new Error(`Item ${itemId} not found`);
+      }
+
+      const currentStock = currentItem.stockQuantity;
+      const newStock = currentStock - purchasedQuantity;
+
+      console.log(`📦 Item ${itemId}: Current stock: ${currentStock}, Purchased: ${purchasedQuantity}, New stock: ${newStock}`);
+
+      if (newStock < 0) {
+        console.log(`❌ Insufficient stock for item ${itemId}. Available: ${currentStock}, Requested: ${purchasedQuantity}`);
+        throw new Error(`Insufficient stock for item. Available: ${currentStock}, Requested: ${purchasedQuantity}`);
+      }
+
+      // Update the item with reduced stock quantity
+      const updateData = {
+        IDItem: currentItem.idItem,
+        ItemCategoryID: currentItem.itemCategoryID,
+        Title: currentItem.title,
+        Description: currentItem.description,
+        StockQuantity: newStock,
+        Price: currentItem.price,
+        Weight: currentItem.weight,
+      };
+
+      const updateUrl = `${API_BASE_URL}/item/${itemId}`;
+      console.log('📦 Updating item stock:', JSON.stringify(updateData, null, 2));
+
+      const response = await fetch(updateUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('❌ Update item stock error:', errorText);
+        throw new Error(`Failed to update item stock: ${errorText}`);
+      }
+
+      console.log(`✅ Successfully reduced stock for item ${itemId} from ${currentStock} to ${newStock}`);
+
+    } catch (error) {
+      console.log('💥 Update item stock exception:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to update item stock');
+    }
+  }
+
+  static async getItemById(itemId: number, token: string): Promise<any> {
+    try {
+      const url = `${API_BASE_URL}/item/${itemId}`;
+      console.log('🔍 Get item by ID:', { url, itemId });
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('❌ Get item by ID error:', errorText);
+        throw new Error(errorText || 'Failed to load item');
+      }
+
+      const data = await response.json();
+      console.log('✅ Loaded item:', JSON.stringify(data, null, 2));
+
+      // Convert backend naming to frontend naming
+      return {
+        idItem: data.idItem || data.IDItem,
+        itemCategoryID: data.itemCategoryID || data.ItemCategoryID,
+        title: data.title || data.Title,
+        description: data.description || data.Description,
+        stockQuantity: data.stockQuantity || data.StockQuantity,
+        price: data.price || data.Price,
+        weight: data.weight || data.Weight,
+      };
+
+    } catch (error) {
+      console.log('💥 Get item by ID exception:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to load item');
+    }
+  }
+
+  static async getItemStock(itemId: number, token: string): Promise<number> {
+    try {
+      const url = `${API_BASE_URL}/item/items/${itemId}/stock`;
+      console.log('🔍 Get item stock:', { url, itemId });
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('❌ Get item stock error:', errorText);
+        throw new Error(errorText || 'Failed to load item stock');
+      }
+
+      const stockData = await response.json();
+      console.log('✅ Loaded item stock:', stockData);
+
+      // The API might return the stock as a number or as an object with stock property
+      const stock = typeof stockData === 'number' ? stockData : stockData.stock || stockData.StockQuantity || 0;
+      
+      return stock;
+
+    } catch (error) {
+      console.log('💥 Get item stock exception:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to load item stock');
     }
   }
 } 
