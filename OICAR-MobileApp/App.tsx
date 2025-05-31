@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { View, StyleSheet, Platform, Text } from 'react-native';
+import { View, StyleSheet, Platform, Text, useColorScheme } from 'react-native';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -231,7 +231,7 @@ export default function App() {
           activeItem={currentScreen}
         />
       )}
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
     </View>
   );
 }

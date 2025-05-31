@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -75,7 +75,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     }
   };
 
-  const filterItems = () => {
+  const filterItems = useCallback(() => {
     let filtered = items;
 
     // Filter by category
@@ -92,9 +92,9 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     }
 
     setFilteredItems(filtered);
-  };
+  }, [items, selectedCategory, searchQuery]);
 
-  const handleSearchSubmit = async () => {
+  const handleSearchSubmit = useCallback(async () => {
     if (!searchQuery.trim()) {
       filterItems();
       return;
@@ -117,7 +117,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     } finally {
       setSearchLoading(false);
     }
-  };
+  }, [searchQuery, selectedCategory, filterItems]);
 
   const handleCategorySelect = (categoryId: number | null) => {
     setSelectedCategory(categoryId);
@@ -125,16 +125,18 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     setSearchQuery(''); // Clear search when changing category
   };
 
-  const getCategoryName = (categoryId: number): string => {
-    console.log(`🔍 Looking for category ID: ${categoryId}`);
-    console.log(`📋 Available categories:`, categories.map(cat => ({ id: cat.idItemCategory, name: cat.categoryName })));
-    
-    const category = categories.find(cat => cat.idItemCategory === categoryId);
-    const result = category ? category.categoryName : 'Unknown';
-    
-    console.log(`📝 Category result for ID ${categoryId}: ${result}`);
-    return result;
-  };
+  // Memoized category lookup map for performance
+  const categoryMap = useMemo(() => {
+    const map = new Map<number, string>();
+    categories.forEach(category => {
+      map.set(category.idItemCategory, category.categoryName);
+    });
+    return map;
+  }, [categories]);
+
+  const getCategoryName = useCallback((categoryId: number): string => {
+    return categoryMap.get(categoryId) || 'Unknown';
+  }, [categoryMap]);
 
   const getSelectedCategoryName = (): string => {
     if (selectedCategory === null) return 'All Products';
@@ -148,7 +150,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     loadData();
   };
 
-  const loadUserCart = async () => {
+  const loadUserCart = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -169,9 +171,9 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       console.log('❌ Failed to load cart:', error);
       // Don't show alert for cart loading errors - cart functionality is optional
     }
-  };
+  }, [token]);
 
-  const handleAddToCart = async (item: ItemDTO) => {
+  const handleAddToCart = useCallback(async (item: ItemDTO) => {
     console.log('🛒 === ADD TO CART DEBUG START ===');
     console.log('🛒 Item to add:', JSON.stringify(item, null, 2));
     console.log('🛒 Token available:', !!token);
@@ -256,9 +258,9 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       setAddingToCart(null);
       console.log('🛒 === ADD TO CART DEBUG END ===');
     }
-  };
+  }, [token, cart, loadUserCart]);
 
-  const renderProductItem = ({ item }: { item: ItemDTO }) => (
+  const renderProductItem = useCallback(({ item }: { item: ItemDTO }) => (
     <View style={styles.productCard}>
       <View style={styles.productHeader}>
         <Text style={styles.productTitle}>{item.title || 'Untitled Product'}</Text>
@@ -302,7 +304,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
         </TouchableOpacity>
       </View>
     </View>
-  );
+  ), [getCategoryName, addingToCart, handleAddToCart]);
 
   if (loading) {
     return (

@@ -23,8 +23,8 @@
         "backgroundColor": "#ffffff"
       },
       "statusBar": {
-        "barStyle": "light-content",
-        "backgroundColor": "#343a40"
+        "barStyle": "dark-content",
+        "backgroundColor": "#f8f9fa"
       }
     },
     "web": {
