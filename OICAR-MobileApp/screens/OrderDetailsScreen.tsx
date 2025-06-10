@@ -70,14 +70,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
 
       // Find order info from a previous call or create a minimal one
       // For now, we'll need to get the order info separately
-      const parsed = JWTUtils.parseToken(token);
-      const userId = parsed?.id;
-      
-      if (!userId) {
-        throw new Error('Could not verify user identity');
-      }
-
-      const userOrders = await OrderService.getUserOrders(parseInt(userId), token);
+      const userOrders = await OrderService.getUserOrders(token);
       const orderInfo = userOrders.find(o => o.idOrder === orderId);
 
       if (!orderInfo) {

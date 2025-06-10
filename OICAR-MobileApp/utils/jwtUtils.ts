@@ -1,11 +1,19 @@
 export interface JWTPayload {
-  sub: string; // username
-  id: string;  // user ID
-  role: string;
+  // Standard claims
+  sub?: string; // username
+  id?: string;  // user ID
+  role?: string;
   exp: number; // expiration timestamp
   iss: string;
   aud: string;
   jti: string;
+  
+  // Microsoft-style claims
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'?: string;
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'?: string;
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'?: string;
+  'IsAdmin'?: string;
+  [key: string]: any; // Allow any additional claims
 }
 
 export class JWTUtils {
@@ -46,13 +54,55 @@ export class JWTUtils {
   static getUserIdFromToken(token: string): number | null {
     console.log('🔍 Extracting user ID from token...');
     const payload = this.parseToken(token);
-    if (payload && payload.id) {
-      console.log('🔍 Found user ID in payload:', payload.id);
-      const userId = parseInt(payload.id, 10);
-      console.log('🔍 Parsed user ID as number:', userId);
-      return isNaN(userId) ? null : userId;
+    if (payload) {
+      // Try different claim formats
+      const userId = payload.id || 
+                    payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+                    payload.sub;
+      
+      if (userId) {
+        console.log('🔍 Found user ID in payload:', userId);
+        const parsedUserId = parseInt(userId, 10);
+        console.log('🔍 Parsed user ID as number:', parsedUserId);
+        return isNaN(parsedUserId) ? null : parsedUserId;
+      }
     }
     console.log('❌ No user ID found in token payload');
+    return null;
+  }
+
+  static getUsernameFromToken(token: string): string | null {
+    console.log('🔍 Extracting username from token...');
+    const payload = this.parseToken(token);
+    if (payload) {
+      // Try different claim formats
+      const username = payload.sub || 
+                      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+                      payload.username;
+      
+      if (username) {
+        console.log('🔍 Found username in payload:', username);
+        return username;
+      }
+    }
+    console.log('❌ No username found in token payload');
+    return null;
+  }
+
+  static getEmailFromToken(token: string): string | null {
+    console.log('🔍 Extracting email from token...');
+    const payload = this.parseToken(token);
+    if (payload) {
+      // Try different claim formats
+      const email = payload.email || 
+                   payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
+      
+      if (email) {
+        console.log('🔍 Found email in payload:', email);
+        return email;
+      }
+    }
+    console.log('❌ No email found in token payload');
     return null;
   }
 

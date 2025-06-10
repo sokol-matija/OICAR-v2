@@ -46,12 +46,9 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
     if (!token) return;
 
     try {
-      const userId = JWTUtils.parseToken(token)?.id;
-      if (!userId) return;
-
-      console.log('🛒 Loading cart for user:', userId);
+      console.log('🛒 Loading cart...');
       
-      const userCart = await CartService.getUserCart(parseInt(userId), token);
+      const userCart = await CartService.getUserCart(token);
       setCart(userCart);
 
       if (userCart && userCart.cartItems.length > 0) {
@@ -120,9 +117,8 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
     setCheckingOut(true);
 
     try {
-      console.log('🔍 Parsing JWT token for user ID...');
-      const parsed = JWTUtils.parseToken(token);
-      const userId = parsed?.id;
+      console.log('🔍 Extracting user ID from token...');
+      const userId = JWTUtils.getUserIdFromToken(token);
       
       if (!userId) {
         console.log('❌ Could not extract user ID from token');
@@ -133,7 +129,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
       console.log('🛒 Creating order from cart...');
       
       // Create order from cart
-      const createdOrder = await OrderService.createOrderFromCart(cart, parseInt(userId), token);
+      const createdOrder = await OrderService.createOrderFromCart(cart, userId, token);
       console.log('✅ Order created:', JSON.stringify(createdOrder, null, 2));
 
       // Clear the cart after successful order creation

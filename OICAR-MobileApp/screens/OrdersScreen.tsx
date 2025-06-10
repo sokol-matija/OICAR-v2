@@ -54,19 +54,9 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token, onReorderItems }) =>
     try {
       console.log('📋 Loading user orders...');
       
-      // Get user ID from token
-      const parsed = JWTUtils.parseToken(token);
-      const userId = parsed?.id;
-      
-      if (!userId) {
-        throw new Error('Could not verify user identity');
-      }
-
-      console.log('🔍 Loading orders for user:', userId);
-      
-      // Load orders and statuses in parallel
+      // Load orders and statuses in parallel (no need to extract user ID from token anymore)
       const [ordersData, statusesData] = await Promise.all([
-        OrderService.getUserOrders(parseInt(userId), token),
+        OrderService.getUserOrders(token),
         OrderService.getAllStatuses(token)
       ]);
 
@@ -84,10 +74,17 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token, onReorderItems }) =>
       
     } catch (error) {
       console.log('💥 Load orders error:', error);
-      Alert.alert(
-        'Error Loading Orders',
-        error instanceof Error ? error.message : 'Failed to load orders'
-      );
+      
+      // Handle 403 errors (no orders) more gracefully
+      if (error instanceof Error && (error.message.includes('403') || error.message.includes('Forbidden'))) {
+        console.log('📋 User has no orders (403 response) - showing empty state');
+        setOrders([]);
+      } else {
+        Alert.alert(
+          'Error Loading Orders',
+          error instanceof Error ? error.message : 'Failed to load orders'
+        );
+      }
     } finally {
       setLoading(false);
     }

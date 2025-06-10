@@ -6,21 +6,21 @@ import { ProductService } from './productService';
 // Use different URLs for different platforms
 const getApiBaseUrl = () => {
   if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:7118/api';
+    return 'http://10.0.2.2:5042/api';
   } else if (Platform.OS === 'ios') {
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   } else {
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   }
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
 export class OrderService {
-  static async getUserOrders(userId: number, token: string): Promise<OrderDTO[]> {
+  static async getUserOrders(token: string): Promise<OrderDTO[]> {
     try {
-      const url = `${API_BASE_URL}/order/users/${userId}`;
-      console.log('🔍 Get user orders:', { url, userId });
+      const url = `${API_BASE_URL}/orders/my`;
+      console.log('🔍 Get user orders:', { url });
       
       const response = await fetch(url, {
         method: 'GET',
@@ -151,7 +151,7 @@ export class OrderService {
         TotalAmount: totalAmount,
       };
       
-      const orderUrl = `${API_BASE_URL}/order`;
+      const orderUrl = `${API_BASE_URL}/orders`;
       console.log('📦 Creating order:', JSON.stringify(orderData, null, 2));
       
       const orderResponse = await fetch(orderUrl, {
@@ -177,7 +177,7 @@ export class OrderService {
       // The backend returns the original order with IDOrder still 0
       // Let's fetch all orders for this user and get the latest one
       console.log('🔍 Fetching user orders to find the created order...');
-      const userOrders = await this.getUserOrders(userId, token);
+      const userOrders = await this.getUserOrders(token);
       console.log('📋 User orders after creation:', JSON.stringify(userOrders, null, 2));
       
       // Find the most recent order (highest ID)
@@ -286,37 +286,22 @@ export class OrderService {
 
   static async getAllStatuses(token: string): Promise<StatusDTO[]> {
     try {
-      const url = `${API_BASE_URL}/status`;
-      console.log('🔍 Get all statuses:', url);
+      // For now, return hardcoded statuses since the API doesn't have a direct status endpoint
+      // The /api/status endpoint returns system status, not order statuses
+      console.log('🔍 Get all statuses: using hardcoded values');
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      console.log('📡 Get statuses response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log('❌ Get statuses error:', errorText);
-        throw new Error(errorText || 'Failed to load statuses');
-      }
-
-      const data = await response.json();
-      console.log('✅ Loaded statuses response:', JSON.stringify(data, null, 2));
+      const statusDTOs = [
+        { idStatus: 1, name: 'Pending', description: 'Order is pending', isActive: true },
+        { idStatus: 2, name: 'Processing', description: 'Order is being processed', isActive: true },
+        { idStatus: 3, name: 'Shipped', description: 'Order has been shipped', isActive: true },
+        { idStatus: 4, name: 'Delivered', description: 'Order has been delivered', isActive: true },
+        { idStatus: 5, name: 'Cancelled', description: 'Order has been cancelled', isActive: true },
+        { idStatus: 6, name: 'Returned', description: 'Order has been returned', isActive: true },
+      ];
       
-      // Convert backend naming to frontend naming
-      const statuses = (Array.isArray(data) ? data : []).map((status: any) => ({
-        idStatus: status.idStatus || status.IDStatus,
-        name: status.name || status.Name,
-        description: status.description || status.Description,
-      }));
+      console.log('✅ Converted statuses:', statusDTOs);
       
-      console.log('✅ Converted statuses:', JSON.stringify(statuses, null, 2));
-      return statuses;
+      return statusDTOs;
     } catch (error) {
       console.log('💥 Get statuses exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to load statuses');

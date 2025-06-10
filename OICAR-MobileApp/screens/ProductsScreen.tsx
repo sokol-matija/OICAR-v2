@@ -75,50 +75,6 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     }
   };
 
-  const filterItems = useCallback(() => {
-    let filtered = items;
-
-    // Filter by category
-    if (selectedCategory !== null) {
-      filtered = filtered.filter(item => item.itemCategoryID === selectedCategory);
-    }
-
-    // Filter by search query
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    setFilteredItems(filtered);
-  }, [items, selectedCategory, searchQuery]);
-
-  const handleSearchSubmit = useCallback(async () => {
-    if (!searchQuery.trim()) {
-      filterItems();
-      return;
-    }
-
-    try {
-      setSearchLoading(true);
-      const searchResults = await ProductService.searchItemsByTitle(searchQuery);
-      
-      // If we have a category selected, filter the search results by category
-      let filtered = searchResults;
-      if (selectedCategory !== null) {
-        filtered = searchResults.filter(item => item.itemCategoryID === selectedCategory);
-      }
-      
-      setFilteredItems(filtered);
-    } catch (error) {
-      console.log('❌ Search failed:', error);
-      Alert.alert('Error', 'Failed to search products');
-    } finally {
-      setSearchLoading(false);
-    }
-  }, [searchQuery, selectedCategory, filterItems]);
-
   const handleCategorySelect = (categoryId: number | null) => {
     setSelectedCategory(categoryId);
     setShowCategoryDropdown(false);
@@ -138,6 +94,82 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     return categoryMap.get(categoryId) || 'Unknown';
   }, [categoryMap]);
 
+  const filterItems = useCallback(() => {
+    let filtered = items;
+
+    // Filter by category
+    if (selectedCategory !== null) {
+      // Find the category name for the selected category ID
+      const selectedCategoryName = getCategoryName(selectedCategory);
+      console.log('🔍 Filtering by category:', { selectedCategory, selectedCategoryName });
+      
+      filtered = filtered.filter(item => {
+        const hasMatchingCategoryId = item.itemCategoryID === selectedCategory;
+        const hasMatchingCategoryName = (item as any).categoryName === selectedCategoryName;
+        
+        console.log('🔍 Item filter check:', {
+          itemTitle: item.title,
+          itemCategoryID: item.itemCategoryID,
+          itemCategoryName: (item as any).categoryName,
+          selectedCategory,
+          selectedCategoryName,
+          hasMatchingCategoryId,
+          hasMatchingCategoryName,
+          matches: hasMatchingCategoryId || hasMatchingCategoryName
+        });
+        
+        // Check both itemCategoryID and categoryName for compatibility
+        return hasMatchingCategoryId || hasMatchingCategoryName;
+      });
+      
+      console.log('🔍 Filtered items count:', filtered.length);
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(item => 
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredItems(filtered);
+  }, [items, selectedCategory, searchQuery, getCategoryName]);
+
+  // Filter items when data loads or category selection changes
+  useEffect(() => {
+    filterItems();
+  }, [filterItems]);
+
+  const handleSearchSubmit = useCallback(async () => {
+    if (!searchQuery.trim()) {
+      filterItems();
+      return;
+    }
+
+    try {
+      setSearchLoading(true);
+      const searchResults = await ProductService.searchItemsByTitle(searchQuery);
+      
+      // If we have a category selected, filter the search results by category
+      let filtered = searchResults;
+      if (selectedCategory !== null) {
+        const selectedCategoryName = getCategoryName(selectedCategory);
+        filtered = searchResults.filter(item => {
+          return item.itemCategoryID === selectedCategory || 
+                 (item as any).categoryName === selectedCategoryName;
+        });
+      }
+      
+      setFilteredItems(filtered);
+    } catch (error) {
+      console.log('❌ Search failed:', error);
+      Alert.alert('Error', 'Failed to search products');
+    } finally {
+      setSearchLoading(false);
+    }
+  }, [searchQuery, selectedCategory, filterItems]);
+
   const getSelectedCategoryName = (): string => {
     if (selectedCategory === null) return 'All Products';
     return getCategoryName(selectedCategory);
@@ -154,16 +186,8 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     if (!token) return;
 
     try {
-      const userId = JWTUtils.parseToken(token)?.id;
-      if (!userId) return;
-
       console.log('🔄 Loading user cart...');
-      let userCart = await CartService.getUserCart(parseInt(userId), token);
-      
-      if (!userCart) {
-        // Create a new cart if none exists
-        userCart = await CartService.createCart(parseInt(userId), token);
-      }
+      let userCart = await CartService.getUserCart(token);
       
       setCart(userCart);
       console.log('✅ Cart loaded successfully');
@@ -195,43 +219,11 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     console.log('🛒 Set adding to cart for item:', item.idItem);
 
     try {
-      console.log('🛒 Parsing JWT token...');
-      const tokenPayload = JWTUtils.parseToken(token);
-      console.log('🛒 JWT Payload:', JSON.stringify(tokenPayload, null, 2));
-      
-      const userId = tokenPayload?.id;
-      console.log('🛒 Extracted user ID:', userId);
-      
-      if (!userId) {
-        console.log('❌ No user ID in token');
-        Alert.alert('Error', 'Invalid authentication token');
-        return;
-      }
-
-      console.log('🛒 Current cart state:', JSON.stringify(cart, null, 2));
-      
-      let currentCart = cart;
-      if (!currentCart) {
-        console.log('🛒 No cart exists, creating new cart...');
-        currentCart = await CartService.createCart(parseInt(userId), token);
-        console.log('🛒 Created cart:', JSON.stringify(currentCart, null, 2));
-        setCart(currentCart);
-      }
-
-      console.log('🛒 Final cart to use:', JSON.stringify(currentCart, null, 2));
-      console.log('🛒 Cart ID for adding item:', currentCart.idCart);
-
-      if (!currentCart.idCart || currentCart.idCart <= 0) {
-        console.log('❌ Invalid cart ID:', currentCart.idCart);
-        throw new Error('Invalid cart ID - cart creation may have failed');
-      }
-
-      console.log('🛒 Adding item to cart...');
-      console.log('🛒 Cart ID:', currentCart.idCart);
+      console.log('🛒 Adding item to cart directly...');
       console.log('🛒 Item ID:', item.idItem);
       console.log('🛒 Quantity:', 1);
       
-      await CartService.addItemToCart(currentCart.idCart, item.idItem, 1, token);
+      await CartService.addItemToCart(item.idItem, 1, token);
       console.log('✅ Item added successfully');
       
       // Update local stock count (optimistic update)
@@ -274,7 +266,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       <View style={styles.productFooter}>
         <View style={styles.productInfo}>
           <Text style={styles.productCategory}>
-            {getCategoryName(item.itemCategoryID || 0)}
+            {(item as any).categoryName || getCategoryName(item.itemCategoryID || 0)}
           </Text>
           <View style={styles.productMeta}>
             <Text style={[styles.productStock, (item.stockQuantity || 0) > 0 ? styles.inStock : styles.outOfStock]}>

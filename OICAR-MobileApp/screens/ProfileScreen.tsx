@@ -43,15 +43,8 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
       
       console.log('🔍 Loading profile with token:', token.substring(0, 20) + '...');
       
-      const userId = JWTUtils.getUserIdFromToken(token);
-      console.log('📋 Extracted user ID:', userId);
-      
-      if (!userId) {
-        throw new Error('Cannot extract user ID from token. Token may be invalid.');
-      }
-
-      console.log('🚀 Fetching profile for user ID:', userId);
-      const profile = await UserService.getUserProfile(userId, token);
+      console.log('🚀 Fetching profile...');
+      const profile = await UserService.getUserProfile(token);
       console.log('✅ Profile loaded:', profile);
       
       setUserProfile(profile);

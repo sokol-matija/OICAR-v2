@@ -5,13 +5,13 @@ import { Platform } from 'react-native';
 const getApiBaseUrl = () => {
   if (Platform.OS === 'android') {
     // Android emulator needs 10.0.2.2 to reach host machine
-    return 'http://10.0.2.2:7118/api';
+    return 'http://10.0.2.2:5042/api';
   } else if (Platform.OS === 'ios') {
     // iOS simulator can use localhost
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   } else {
     // Web can use localhost
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   }
 };
 
@@ -22,7 +22,7 @@ export class AuthService {
     try {
       const url = `${API_BASE_URL}/auth/login`;
       const payload = {
-        Email: loginData.email,
+        Username: loginData.email, // The mobile app uses email field but API expects Username
         Password: loginData.password,
       };
       
@@ -46,8 +46,8 @@ export class AuthService {
 
       const data = await response.json();
       console.log('✅ Login success - Full response:', data);
-      console.log('🔑 Token value:', data.Token || data.token);
-      return { token: data.Token || data.token };
+      console.log('🔑 Token value:', data.data?.token || data.Token || data.token);
+      return { token: data.data?.token || data.Token || data.token };
     } catch (error) {
       console.log('💥 Login exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Login failed');
@@ -61,6 +61,7 @@ export class AuthService {
         Username: registerData.username,
         Email: registerData.email,
         Password: registerData.password,
+        ConfirmPassword: registerData.password,
         FirstName: registerData.firstName,
         LastName: registerData.lastName,
         PhoneNumber: registerData.phoneNumber,
@@ -84,9 +85,9 @@ export class AuthService {
         throw new Error(errorText || 'Registration failed');
       }
 
-      const result = await response.text();
-      console.log('✅ Register success:', result);
-      return result;
+      const data = await response.json();
+      console.log('✅ Register success:', data);
+      return data.message || 'Registration successful';
     } catch (error) {
       console.log('💥 Register exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Registration failed');

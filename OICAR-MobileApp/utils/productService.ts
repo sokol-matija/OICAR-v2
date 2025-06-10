@@ -4,11 +4,11 @@ import { ItemDTO, ItemCategoryDTO } from '../types/product';
 // Use different URLs for different platforms
 const getApiBaseUrl = () => {
   if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:7118/api';
+    return 'http://10.0.2.2:5042/api';
   } else if (Platform.OS === 'ios') {
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   } else {
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   }
 };
 
@@ -17,7 +17,7 @@ const API_BASE_URL = getApiBaseUrl();
 export class ProductService {
   static async getAllItems(): Promise<ItemDTO[]> {
     try {
-      const url = `${API_BASE_URL}/item`;
+      const url = `${API_BASE_URL}/items`;
       console.log('🔍 Get all items:', { url });
       
       const response = await fetch(url, {
@@ -35,7 +35,11 @@ export class ProductService {
         throw new Error(errorText || 'Failed to load items');
       }
 
-      const data = await response.json();
+      const response_data = await response.json();
+      console.log('🔍 Full API response:', JSON.stringify(response_data, null, 2));
+      
+      // Handle the new API response format
+      const data = response_data.data?.data || response_data.data || response_data;
       console.log(`✅ Loaded ${data.length} items`);
       console.log('🔍 First item raw data:', JSON.stringify(data[0], null, 2));
       
@@ -66,7 +70,7 @@ export class ProductService {
 
   static async getAllCategories(): Promise<ItemCategoryDTO[]> {
     try {
-      const url = `${API_BASE_URL}/itemcategory`;
+      const url = `${API_BASE_URL}/categories`;
       console.log('🔍 Get all categories:', { url });
       
       const response = await fetch(url, {
@@ -84,7 +88,11 @@ export class ProductService {
         throw new Error(errorText || 'Failed to load categories');
       }
 
-      const data = await response.json();
+      const response_data = await response.json();
+      console.log('🔍 Full categories API response:', JSON.stringify(response_data, null, 2));
+      
+      // Handle the new API response format (categories are directly in data array)
+      const data = response_data.data || response_data;
       console.log(`✅ Loaded ${data.length} categories`);
       console.log('🔍 First category raw data:', JSON.stringify(data[0], null, 2));
       
@@ -119,7 +127,10 @@ export class ProductService {
         throw new Error(errorText || 'Failed to load items by category');
       }
 
-      const data = await response.json();
+      const response_data = await response.json();
+      
+      // Handle the new API response format
+      const data = response_data.data?.data || response_data.data || response_data;
       console.log(`✅ Loaded ${data.length} items for category ${categoryId}`);
       
       // Convert backend naming to frontend naming
@@ -158,7 +169,10 @@ export class ProductService {
         throw new Error(errorText || 'Failed to search items');
       }
 
-      const data = await response.json();
+      const response_data = await response.json();
+      
+      // Handle the new API response format
+      const data = response_data.data?.data || response_data.data || response_data;
       console.log(`✅ Found ${data.length} items matching "${title}"`);
       
       // Convert backend naming to frontend naming

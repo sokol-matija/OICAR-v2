@@ -4,21 +4,21 @@ import { UserDTO, UpdateUserDTO } from '../types/user';
 // Use different URLs for different platforms
 const getApiBaseUrl = () => {
   if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:7118/api';
+    return 'http://10.0.2.2:5042/api';
   } else if (Platform.OS === 'ios') {
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   } else {
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   }
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
 export class UserService {
-  static async getUserProfile(userId: number, token: string): Promise<UserDTO> {
+  static async getUserProfile(token: string): Promise<UserDTO> {
     try {
-      const url = `${API_BASE_URL}/user/${userId}`;
-      console.log('🔍 Get user profile:', { url, userId });
+      const url = `${API_BASE_URL}/users/profile`;
+      console.log('🔍 Get user profile:', { url });
       
       const response = await fetch(url, {
         method: 'GET',
@@ -36,10 +36,11 @@ export class UserService {
         throw new Error(errorText || 'Failed to load profile');
       }
 
-      const data = await response.json();
-      console.log('🔍 Raw API response:', JSON.stringify(data, null, 2));
+      const response_data = await response.json();
+      console.log('🔍 Raw API response:', JSON.stringify(response_data, null, 2));
       
-      // Check what fields are actually in the response
+      // Handle the new API response format
+      const data = response_data.data || response_data;
       console.log('🔍 Available fields:', Object.keys(data));
       
       // Convert backend naming to frontend naming
@@ -64,9 +65,8 @@ export class UserService {
 
   static async updateUserProfile(userData: UpdateUserDTO, token: string): Promise<void> {
     try {
-      const url = `${API_BASE_URL}/user/${userData.idUser}`;
+      const url = `${API_BASE_URL}/users/profile`;
       const payload = {
-        IDUser: userData.idUser,
         Username: userData.username,
         Email: userData.email,
         FirstName: userData.firstName,

@@ -33,9 +33,9 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
     const newErrors: Partial<LoginDTO> = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = 'Username is required';
+    } else if (formData.email.trim().length < 3) {
+      newErrors.email = 'Username must be at least 3 characters';
     }
 
     if (!formData.password.trim()) {
@@ -72,7 +72,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
 
   const fillTestCredentials = () => {
     setFormData({
-      email: 'a@gmail.com',
+      email: 'abc',
       password: '123456',
     });
     // Clear any existing errors
@@ -110,13 +110,12 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
             {/* Card Body */}
             <View style={styles.cardBody}>
               <CustomInput
-                label="Email"
+                label="Username"
                 value={formData.email}
                 onChangeText={(value) => updateFormData('email', value)}
                 error={errors.email}
-                placeholder="Enter your email"
+                placeholder="Enter your username"
                 autoCapitalize="none"
-                keyboardType="email-address"
               />
 
               <CustomInput

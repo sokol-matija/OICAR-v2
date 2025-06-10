@@ -4,21 +4,21 @@ import { CartDTO, CartItemDTO, AddToCartRequest } from '../types/cart';
 // Use different URLs for different platforms
 const getApiBaseUrl = () => {
   if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:7118/api';
+    return 'http://10.0.2.2:5042/api';
   } else if (Platform.OS === 'ios') {
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   } else {
-    return 'http://localhost:7118/api';
+    return 'http://localhost:5042/api';
   }
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
 export class CartService {
-  static async getUserCart(userId: number, token: string): Promise<CartDTO | null> {
+  static async getUserCart(token: string): Promise<CartDTO | null> {
     try {
-      const url = `${API_BASE_URL}/cart/users/${userId}`;
-      console.log('🔍 Get user cart:', { url, userId });
+      const url = `${API_BASE_URL}/cart`;
+      console.log('🔍 Get user cart:', { url });
       console.log('🔍 Token for get cart:', token ? 'Present' : 'Missing');
       
       const response = await fetch(url, {
@@ -31,12 +31,6 @@ export class CartService {
 
       console.log('📡 Get cart response status:', response.status);
 
-      if (response.status === 404) {
-        // No cart exists yet, return null
-        console.log('ℹ️ No cart found for user (404 response)');
-        return null;
-      }
-
       if (!response.ok) {
         const errorText = await response.text();
         console.log('❌ Get cart error:', errorText);
@@ -46,15 +40,22 @@ export class CartService {
       const data = await response.json();
       console.log(`✅ Loaded cart response:`, JSON.stringify(data, null, 2));
       
-      // Convert backend naming to frontend naming
+      // Parse the API response structure
+      const cartData = data.data || data;
+      const items = cartData.items || [];
+      
+      // Convert to our DTO format
       const cartDTO = {
-        idCart: data.idCart || data.IDCart,
-        userID: data.userID || data.UserID,
-        cartItems: (data.cartItems || data.CartItems || []).map((item: any) => ({
+        idCart: 1, // Use a dummy cart ID since the API doesn't return one
+        userID: 0, // Use a dummy user ID
+        cartItems: items.map((item: any) => ({
           idCartItem: item.idCartItem || item.IDCartItem,
           itemID: item.itemID || item.ItemID,
-          cartID: item.cartID || item.CartID,
+          cartID: 1, // Use dummy cart ID
           quantity: item.quantity || item.Quantity,
+          itemTitle: item.itemTitle,
+          itemPrice: item.itemPrice,
+          lineTotal: item.lineTotal,
         })),
       };
       
@@ -68,69 +69,17 @@ export class CartService {
     }
   }
 
-  static async createCart(userId: number, token: string): Promise<CartDTO> {
+  // Cart is automatically created when adding the first item, so this method is not needed
+
+  static async addItemToCart(itemId: number, quantity: number, token: string): Promise<void> {
     try {
-      const url = `${API_BASE_URL}/cart`;
-      console.log('🔍 Create cart:', { url, userId });
-      
-      const cartData = {
-        UserID: userId,
-        CartItems: []
-      };
-      
-      console.log('📦 Cart creation payload:', JSON.stringify(cartData, null, 2));
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(cartData),
-      });
-
-      console.log('📡 Create cart response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log('❌ Create cart error:', errorText);
-        throw new Error(errorText || 'Failed to create cart');
-      }
-
-      const data = await response.json();
-      console.log('✅ Created new cart response:', JSON.stringify(data, null, 2));
-      
-      // Convert backend naming to frontend naming
-      const cartDTO = {
-        idCart: data.idCart || data.IDCart,
-        userID: data.userID || data.UserID,
-        cartItems: [],
-      };
-      
-      console.log('✅ Converted cart DTO:', JSON.stringify(cartDTO, null, 2));
-      
-      if (!cartDTO.idCart || cartDTO.idCart <= 0) {
-        console.log('❌ Cart creation returned invalid ID:', cartDTO.idCart);
-        throw new Error('Cart creation failed - invalid cart ID returned');
-      }
-      
-      return cartDTO;
-    } catch (error) {
-      console.log('💥 Create cart exception:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to create cart');
-    }
-  }
-
-  static async addItemToCart(cartId: number, itemId: number, quantity: number, token: string): Promise<void> {
-    try {
-      // Use the CartItem endpoint to add items directly
-      const url = `${API_BASE_URL}/cartitem`;
-      console.log('🔍 Add item to cart:', { url, cartId, itemId, quantity });
+      // Use the correct cart/items endpoint
+      const url = `${API_BASE_URL}/cart/items`;
+      console.log('🔍 Add item to cart:', { url, itemId, quantity });
       console.log('🔍 Token for request:', token ? 'Present' : 'Missing');
       
-      // Create cart item data (no IDCartItem for new items)
+      // Create cart item data according to API expectations
       const cartItemData = {
-        CartID: cartId,
         ItemID: itemId,
         Quantity: quantity,
       };
