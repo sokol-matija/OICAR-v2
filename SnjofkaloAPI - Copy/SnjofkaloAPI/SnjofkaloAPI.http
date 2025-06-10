@@ -1,0 +1,6 @@
+@SnjofkaloAPI_HostAddress = http://localhost:5042
+
+GET {{SnjofkaloAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
