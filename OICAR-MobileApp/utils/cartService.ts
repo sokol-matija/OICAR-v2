@@ -156,10 +156,11 @@ export class CartService {
     }
   }
 
-  static async removeCartItem(cartItemId: number, token: string): Promise<void> {
+  static async removeCartItem(itemId: number, token: string): Promise<void> {
     try {
-      const url = `${API_BASE_URL}/cartitem/${cartItemId}`;
-      console.log('🗑️ Removing cart item:', { url, cartItemId });
+      // SnjofkaloAPI uses cart/items/{itemId} endpoint for removal (by product ID, not cart item ID)
+      const url = `${API_BASE_URL}/cart/items/${itemId}`;
+      console.log('🗑️ Removing cart item:', { url, itemId });
       
       const response = await fetch(url, {
         method: 'DELETE',

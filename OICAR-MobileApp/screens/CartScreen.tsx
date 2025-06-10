@@ -177,7 +177,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
     }
   };
 
-  const handleRemoveItem = async (cartItemId: number) => {
+  const handleRemoveItem = async (itemId: number) => {
     if (!token) {
       Alert.alert('Authentication Required', 'Please log in to remove items');
       return;
@@ -192,9 +192,9 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
           text: 'Remove',
           style: 'destructive',
           onPress: async () => {
-            setUpdatingItem(cartItemId);
+            setUpdatingItem(itemId);
             try {
-              await CartService.removeCartItem(cartItemId, token);
+              await CartService.removeCartItem(itemId, token);
               // Reload cart after successful removal
               await loadCart();
               Alert.alert('Success', 'Item removed from cart');
@@ -288,7 +288,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
           
           <TouchableOpacity
             style={[styles.actionButton, styles.removeButton]}
-            onPress={() => handleRemoveItem(item.idCartItem)}
+            onPress={() => handleRemoveItem(item.itemID)}
             disabled={updatingItem === item.idCartItem}
           >
             {updatingItem === item.idCartItem ? (

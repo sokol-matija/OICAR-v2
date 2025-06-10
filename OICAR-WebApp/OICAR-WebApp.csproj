@@ -11,8 +11,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\OICAR\OICAR.csproj" />
-  </ItemGroup>
+
 
 </Project>

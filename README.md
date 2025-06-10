@@ -4,8 +4,9 @@ A .NET 9.0 web application with API backend for an e-commerce platform called OI
 
 ## Project Structure
 
-- **OICAR/**: Main API backend (.NET 9.0)
+- **SnjofkaloAPI - Copy/**: Main API backend (.NET 9.0) - **CURRENTLY ACTIVE**
 - **OICAR-WebApp/**: Frontend web application (ASP.NET Core)
+- **OICAR-MobileApp/**: Mobile application (React Native with Expo)
 - **Database/**: SQL Server database schema and scripts
 - **docker-compose.yml**: Docker setup for SQL Server
 
@@ -56,22 +57,28 @@ docker exec -it oicar-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa
 ### 3. Run the Application
 
 ```bash
-# Start the API backend
-cd OICAR
+# Start the API backend (SnjofkaloAPI)
+cd "SnjofkaloAPI - Copy/SnjofkaloAPI"
 dotnet run
-# API will be available at: http://localhost:7118
+# API will be available at: http://localhost:5042
 
 # In another terminal, start the web application
 cd OICAR-WebApp  
 dotnet run
 # Web app will be available at: http://localhost:5082
+
+# In another terminal, start the mobile application
+cd OICAR-MobileApp
+npm start
+# Mobile app will be available via Expo
 ```
 
 ## Access Points
 
 - **Web Application**: http://localhost:5082
-- **API Backend**: http://localhost:7118
-- **API Documentation (Swagger)**: http://localhost:7118/swagger
+- **API Backend (SnjofkaloAPI)**: http://localhost:5042
+- **API Documentation (Swagger)**: http://localhost:5042/swagger
+- **Mobile Application**: Via Expo (scan QR code)
 - **Database**: localhost:1433 (for DBeaver)
 
 ## Database Connection
@@ -112,8 +119,9 @@ The database includes the following main tables:
 
 1. **Start Database**: `docker-compose up -d`
 2. **Run Migrations**: Initialize schema with `./init-database.sh`
-3. **Start API**: `cd OICAR && dotnet run` (http://localhost:7118)
+3. **Start API**: `cd "SnjofkaloAPI - Copy/SnjofkaloAPI" && dotnet run` (http://localhost:5042)
 4. **Start Web App**: `cd OICAR-WebApp && dotnet run` (http://localhost:5082)
+5. **Start Mobile App**: `cd OICAR-MobileApp && npm start` (Expo QR code)
 
 ## Useful Docker Commands
 
@@ -136,9 +144,9 @@ docker-compose down -v
 
 ## API Endpoints
 
-The API will be available at `http://localhost:7118`.
+The API will be available at `http://localhost:5042`.
 
-API documentation is available via Swagger UI at `http://localhost:7118/swagger` when running in development mode.
+API documentation is available via Swagger UI at `http://localhost:5042/swagger` when running in development mode.
 
 ## Environment Variables
 
