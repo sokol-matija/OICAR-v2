@@ -41,15 +41,18 @@ export class OrderService {
       const data = await response.json();
       console.log('✅ Loaded orders response:', JSON.stringify(data, null, 2));
       
+      // Handle SnjofkaloAPI response format
+      const ordersData = data.success ? (data.data?.data || data.data || []) : (Array.isArray(data) ? data : []);
+      
       // Convert backend naming to frontend naming
-      const orders = (Array.isArray(data) ? data : []).map((order: any) => {
+      const orders = ordersData.map((order: any) => {
         console.log('🔍 Processing order:', JSON.stringify(order, null, 2));
         const convertedOrder = {
-          idOrder: order.idOrder || order.IDOrder,
-          userID: order.userID || order.UserID,
-          statusID: order.statusID || order.StatusID,
-          orderDate: order.orderDate || order.OrderDate,
-          totalAmount: order.totalAmount || order.TotalAmount || 0,
+          idOrder: order.IDOrder || order.idOrder,
+          userID: order.UserID || order.userID,
+          statusID: order.StatusID || order.statusID,
+          orderDate: order.OrderDate || order.orderDate,
+          totalAmount: order.TotalAmount || order.totalAmount || 0,
         };
         console.log('🔍 Converted to:', JSON.stringify(convertedOrder, null, 2));
         return convertedOrder;
@@ -65,8 +68,9 @@ export class OrderService {
 
   static async getOrderItems(orderId: number, token: string): Promise<OrderItemDTO[]> {
     try {
-      const url = `${API_BASE_URL}/orderitem/orders/${orderId}/items`;
-      console.log('🔍 Get order items:', { url, orderId });
+      // Use the correct SnjofkaloAPI endpoint to get order details
+      const url = `${API_BASE_URL}/orders/my/${orderId}`;
+      console.log('🔍 Get order details:', { url, orderId });
       
       const response = await fetch(url, {
         method: 'GET',
@@ -76,24 +80,27 @@ export class OrderService {
         },
       });
 
-      console.log('📡 Get order items response status:', response.status);
+      console.log('📡 Get order details response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Get order items error:', errorText);
-        throw new Error(errorText || 'Failed to load order items');
+        console.log('❌ Get order details error:', errorText);
+        throw new Error(errorText || 'Failed to load order details');
       }
 
       const data = await response.json();
-      console.log('✅ Loaded order items response:', JSON.stringify(data, null, 2));
+      console.log('✅ Loaded order details response:', JSON.stringify(data, null, 2));
       
-      // Convert backend naming to frontend naming
-      const orderItems = (Array.isArray(data) ? data : []).map((item: any) => ({
-        idOrderItem: item.idOrderItem || item.IDOrderItem,
-        orderID: item.orderID || item.OrderID,
-        itemID: item.itemID || item.ItemID,
-        quantity: item.quantity || item.Quantity,
-      }));
+      // Extract order items from the SnjofkaloAPI response format
+      let orderItems: OrderItemDTO[] = [];
+      if (data.success && data.data && data.data.items) {
+        orderItems = data.data.items.map((item: any) => ({
+          idOrderItem: item.idOrderItem || item.IDOrderItem || 0,
+          orderID: orderId,
+          itemID: item.idItem || item.IDItem || item.itemID || item.ItemID,
+          quantity: item.quantity || item.Quantity || 1,
+        }));
+      }
       
       console.log('✅ Converted order items:', JSON.stringify(orderItems, null, 2));
       return orderItems;
@@ -142,13 +149,11 @@ export class OrderService {
       
       console.log(`💰 Total calculated amount: $${totalAmount}`);
       
-      // First create the order - include all fields that match OrderDTO
+      // Create order using SnjofkaloAPI format - it creates order from existing cart
       const orderData = {
-        IDOrder: 0, // Backend will generate the real ID
-        UserID: userId,
-        StatusID: 1, // Assuming 1 is "Pending" status
-        OrderDate: new Date().toISOString(),
-        TotalAmount: totalAmount,
+        ShippingAddress: "Default Shipping Address", // Optional
+        BillingAddress: "Default Billing Address",   // Optional
+        OrderNotes: "Order created from mobile app"  // Optional
       };
       
       const orderUrl = `${API_BASE_URL}/orders`;
@@ -174,63 +179,39 @@ export class OrderService {
       const orderResult = await orderResponse.json();
       console.log('✅ Created order response:', JSON.stringify(orderResult, null, 2));
       
-      // The backend returns the original order with IDOrder still 0
-      // Let's fetch all orders for this user and get the latest one
-      console.log('🔍 Fetching user orders to find the created order...');
-      const userOrders = await this.getUserOrders(token);
-      console.log('📋 User orders after creation:', JSON.stringify(userOrders, null, 2));
-      
-      // Find the most recent order (highest ID)
-      const latestOrder = userOrders.length > 0 
-        ? userOrders.reduce((latest, current) => 
-            current.idOrder > latest.idOrder ? current : latest
-          )
-        : null;
-        
-      if (!latestOrder || latestOrder.idOrder <= 0) {
-        console.log('❌ Could not find the created order');
-        throw new Error('Order was created but could not retrieve order ID');
-      }
-      
-      const createdOrder = latestOrder;
-      console.log('✅ Found created order:', JSON.stringify(createdOrder, null, 2));
-
-      // Now create order items for each cart item
-      for (const cartItem of cart.cartItems) {
-        const orderItemData = {
-          OrderID: createdOrder.idOrder,
-          ItemID: cartItem.itemID,
-          Quantity: cartItem.quantity,
+      // SnjofkaloAPI returns order data in the response
+      if (orderResult.success && orderResult.data) {
+        const createdOrder = {
+          idOrder: orderResult.data.IDOrder || orderResult.data.idOrder,
+          userID: orderResult.data.UserID || orderResult.data.userID || userId,
+          statusID: orderResult.data.StatusID || orderResult.data.statusID || 1,
+          orderDate: orderResult.data.OrderDate || orderResult.data.orderDate || new Date().toISOString(),
+          totalAmount: orderResult.data.TotalAmount || orderResult.data.totalAmount || totalAmount,
         };
         
-        const orderItemUrl = `${API_BASE_URL}/orderitem`;
-        console.log('📦 Creating order item:', JSON.stringify(orderItemData, null, 2));
+        console.log('✅ Order created successfully:', JSON.stringify(createdOrder, null, 2));
+        return createdOrder;
+      } else {
+        // Fallback: try to fetch user orders to find the latest one
+        console.log('🔍 Fetching user orders to find the created order...');
+        const userOrders = await this.getUserOrders(token);
+        console.log('📋 User orders after creation:', JSON.stringify(userOrders, null, 2));
         
-        const orderItemResponse = await fetch(orderItemUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify(orderItemData),
-        });
-
-        if (!orderItemResponse.ok) {
-          const errorText = await orderItemResponse.text();
-          console.log('❌ Create order item error:', errorText);
-          throw new Error(`Failed to create order item: ${errorText}`);
+        // Find the most recent order (highest ID)
+        const latestOrder = userOrders.length > 0 
+          ? userOrders.reduce((latest, current) => 
+              current.idOrder > latest.idOrder ? current : latest
+            )
+          : null;
+          
+        if (!latestOrder || latestOrder.idOrder <= 0) {
+          console.log('❌ Could not find the created order');
+          throw new Error('Order was created but could not retrieve order ID');
         }
-
-        const orderItemResult = await orderItemResponse.json();
-        console.log('✅ Created order item:', JSON.stringify(orderItemResult, null, 2));
-
-        // Update stock quantity - reduce by purchased amount
-        console.log(`📦 Updating stock for item ${cartItem.itemID}, reducing by ${cartItem.quantity}`);
-        await this.updateItemStock(cartItem.itemID, cartItem.quantity, token);
+        
+        console.log('✅ Found created order:', JSON.stringify(latestOrder, null, 2));
+        return latestOrder;
       }
-
-      console.log('✅ Order created successfully with all items');
-      return createdOrder;
     } catch (error) {
       console.log('💥 Create order exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to create order');

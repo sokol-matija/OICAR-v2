@@ -66,7 +66,8 @@ namespace SnjofkaloAPI.Mappings
             CreateMap<Order, OrderResponse>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
                 .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.Status.Name))
-                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.OrderItems.Sum(oi => oi.Quantity * oi.PriceAtOrder)));
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.OrderItems.Sum(oi => oi.Quantity * oi.PriceAtOrder)))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems));
 
             CreateMap<Order, OrderListResponse>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
