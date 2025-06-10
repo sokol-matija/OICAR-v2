@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    .WriteTo.Console()
+    // Removed .WriteTo.Console() as it's already configured in appsettings.json
     //.WriteTo.SqlServer(
     //    connectionString: builder.Configuration.GetConnectionString("DefaultConnection")!,
     //    sinkOptions: new Serilog.Sinks.SqlServer.SinkOptions
@@ -156,7 +156,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Snjofkalo API V1");
-        c.RoutePrefix = string.Empty;
+        c.RoutePrefix = "swagger"; // Changed from string.Empty to "swagger"
     });
 }
 
@@ -258,6 +258,37 @@ try
     Log.Information("Registered services: Auth, User, Item, Category, Cart, Order, Marketplace");
     Log.Information("Controllers: Auth, Users, Items, Categories, Cart, Orders, Admin, Marketplace");
     Log.Information("Features: GDPR Compliance, Data Encryption, Marketplace, Analytics");
+
+    // Auto-open browser in development mode when running from command line
+    if (app.Environment.IsDevelopment())
+    {
+        var urls = app.Urls.Any() ? app.Urls : new[] { "http://localhost:5042" };
+        var url = urls.First().Replace("*", "localhost") + "/swagger";
+        
+        Log.Information("Opening browser to: {Url}", url);
+        
+        // Cross-platform browser opening
+        try
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            else if (OperatingSystem.IsMacOS())
+            {
+                System.Diagnostics.Process.Start("open", url);
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                System.Diagnostics.Process.Start("xdg-open", url);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning("Could not automatically open browser: {Error}", ex.Message);
+            Log.Information("Please manually open your browser to: {Url}", url);
+        }
+    }
 
     app.Run();
 }
