@@ -30,6 +30,7 @@ function AppContent() {
     setCurrentScreen('home');
     console.log('Login successful! Token received:', token ? 'Yes' : 'No');
     console.log('🚀 Auto-deployment test - App updated!');
+    console.log('🔗 GitHub integration now active!');
   };
 
   const handleRegisterSuccess = () => {
