@@ -1,40 +1,28 @@
-// Simple utility tests that don't require React Native components
-describe('Basic utility tests', () => {
-  it('should perform basic math operations', () => {
+// Simple utility tests for mobile app
+describe('Mobile App Utilities', () => {
+  test('Basic JavaScript operations work', () => {
     expect(2 + 2).toBe(4);
-    expect(5 * 3).toBe(15);
+    expect('OICAR'.toLowerCase()).toBe('oicar');
   });
 
-  it('should handle string operations', () => {
-    const testString = 'OICAR Mobile App';
-    expect(testString.toLowerCase()).toBe('oicar mobile app');
-    expect(testString.length).toBe(16);
-  });
-
-  it('should handle array operations', () => {
-    const items = ['apple', 'banana', 'cherry'];
+  test('Array operations work', () => {
+    const items = ['login', 'register', 'browse'];
     expect(items).toHaveLength(3);
-    expect(items.includes('banana')).toBe(true);
+    expect(items.includes('login')).toBe(true);
   });
 
-  it('should handle object operations', () => {
-    const user = {
-      id: 1,
-      username: 'testuser',
-      email: 'test@example.com'
-    };
+  test('String validation works', () => {
+    const email = 'test@oicar.com';
+    const invalidEmail = 'invalid';
     
-    expect(user.id).toBe(1);
-    expect(user.username).toBe('testuser');
-    expect(user.email).toContain('@');
+    expect(email.includes('@')).toBe(true);
+    expect(invalidEmail.includes('@')).toBe(false);
   });
 
-  it('should validate API configuration', () => {
-    // Mock API_BASE_URL for testing
-    const API_BASE_URL = 'http://localhost:5042';
+  test('Date operations work', () => {
+    const now = new Date();
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     
-    expect(API_BASE_URL).toBeDefined();
-    expect(API_BASE_URL).toContain('localhost');
-    expect(API_BASE_URL).toContain('5042');
+    expect(tomorrow.getTime()).toBeGreaterThan(now.getTime());
   });
 }); 

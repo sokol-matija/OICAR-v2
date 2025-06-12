@@ -1,9 +1,9 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npm test -- --watchAll=false && npx expo export --platform web",
   "outputDirectory": "dist",
   "framework": null,
   "installCommand": "npm install",
-  "devCommand": "npm run web",
+  "devCommand": "npx expo start --web",
   "rewrites": [
     {
       "source": "/(.*)",
