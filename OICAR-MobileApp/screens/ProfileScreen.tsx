@@ -44,7 +44,7 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
       console.log('🔍 Loading profile with token:', token.substring(0, 20) + '...');
       
       console.log('🚀 Fetching profile...');
-      const profile = await UserService.getUserProfile(token);
+      const profile = await UserService.getUserProfile();
       console.log('✅ Profile loaded:', profile);
       
       setUserProfile(profile);

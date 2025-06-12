@@ -48,11 +48,10 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     filterItems();
   }, [items, selectedCategory, searchQuery]);
 
+  // Load cart after login - will be called when component mounts
   useEffect(() => {
-    if (token) {
-      loadUserCart();
-    }
-  }, [token]);
+    loadUserCart();
+  }, []);
 
   const loadData = async () => {
     try {
@@ -183,11 +182,9 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
   };
 
   const loadUserCart = useCallback(async () => {
-    if (!token) return;
-
     try {
       console.log('🔄 Loading user cart...');
-      let userCart = await CartService.getUserCart(token);
+      let userCart = await CartService.getUserCart();
       
       setCart(userCart);
       console.log('✅ Cart loaded successfully');
@@ -195,19 +192,12 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       console.log('❌ Failed to load cart:', error);
       // Don't show alert for cart loading errors - cart functionality is optional
     }
-  }, [token]);
+  }, []);
 
   const handleAddToCart = useCallback(async (item: ItemDTO) => {
     console.log('🛒 === ADD TO CART DEBUG START ===');
     console.log('🛒 Item to add:', JSON.stringify(item, null, 2));
-    console.log('🛒 Token available:', !!token);
     console.log('🛒 Item stock:', item.stockQuantity);
-    
-    if (!token) {
-      console.log('❌ No token available');
-      Alert.alert('Authentication Required', 'Please log in to add items to cart');
-      return;
-    }
 
     if (item.stockQuantity <= 0) {
       console.log('❌ Item out of stock');
@@ -223,7 +213,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       console.log('🛒 Item ID:', item.idItem);
       console.log('🛒 Quantity:', 1);
       
-      await CartService.addItemToCart(item.idItem, 1, token);
+      await CartService.addItemToCart(item.idItem, 1);
       console.log('✅ Item added successfully');
       
       // Update local stock count (optimistic update)
@@ -250,7 +240,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       setAddingToCart(null);
       console.log('🛒 === ADD TO CART DEBUG END ===');
     }
-  }, [token, cart, loadUserCart]);
+  }, [cart, loadUserCart]);
 
   const renderProductItem = useCallback(({ item }: { item: ItemDTO }) => (
     <View style={styles.productCard}>

@@ -1,9 +1,20 @@
 import { CartDTO, CartItemDTO, AddToCartRequest } from '../types/cart';
 import { API_BASE_URL } from './apiConfig';
+import { apiService } from './apiService';
 
 export class CartService {
-  static async getUserCart(token: string): Promise<CartDTO | null> {
+  // Get token from apiService
+  private static getToken(): string {
+    const token = apiService.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+    return token;
+  }
+
+  static async getUserCart(): Promise<CartDTO | null> {
     try {
+      const token = this.getToken();
       const url = `${API_BASE_URL}/cart`;
       console.log('🔍 Get user cart:', { url });
       console.log('🔍 Token for get cart:', token ? 'Present' : 'Missing');
@@ -58,8 +69,9 @@ export class CartService {
 
   // Cart is automatically created when adding the first item, so this method is not needed
 
-  static async addItemToCart(itemId: number, quantity: number, token: string): Promise<void> {
+  static async addItemToCart(itemId: number, quantity: number): Promise<void> {
     try {
+      const token = this.getToken();
       // Use the correct cart/items endpoint
       const url = `${API_BASE_URL}/cart/items`;
       console.log('🔍 Add item to cart:', { url, itemId, quantity });
@@ -104,8 +116,9 @@ export class CartService {
     }
   }
 
-  private static async getCartById(cartId: number, token: string): Promise<CartDTO | null> {
+  private static async getCartById(cartId: number): Promise<CartDTO | null> {
     try {
+      const token = this.getToken();
       const url = `${API_BASE_URL}/cart/${cartId}`;
       
       const response = await fetch(url, {
@@ -143,8 +156,9 @@ export class CartService {
     }
   }
 
-  static async removeCartItem(itemId: number, token: string): Promise<void> {
+  static async removeCartItem(itemId: number): Promise<void> {
     try {
+      const token = this.getToken();
       // SnjofkaloAPI uses cart/items/{itemId} endpoint for removal (by product ID, not cart item ID)
       const url = `${API_BASE_URL}/cart/items/${itemId}`;
       console.log('🗑️ Removing cart item:', { url, itemId });

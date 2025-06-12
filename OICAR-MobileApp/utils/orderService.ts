@@ -2,10 +2,21 @@ import { OrderDTO, OrderItemDTO, StatusDTO, CreateOrderRequest, CreateOrderItemR
 import { CartDTO, CartItemDTO } from '../types/cart';
 import { ProductService } from './productService';
 import { API_BASE_URL } from './apiConfig';
+import { apiService } from './apiService';
 
 export class OrderService {
-  static async getUserOrders(token: string): Promise<OrderDTO[]> {
+  // Get token from apiService
+  private static getToken(): string {
+    const token = apiService.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+    return token;
+  }
+
+  static async getUserOrders(): Promise<OrderDTO[]> {
     try {
+      const token = this.getToken();
       const url = `${API_BASE_URL}/orders/my`;
       console.log('🔍 Get user orders:', { url });
       
@@ -53,11 +64,14 @@ export class OrderService {
     }
   }
 
-  static async getOrderItems(orderId: number, token: string): Promise<OrderItemDTO[]> {
+  static async getOrderItems(orderId: number): Promise<OrderItemDTO[]> {
     try {
-      // Use the correct SnjofkaloAPI endpoint to get order details
-      const url = `${API_BASE_URL}/orders/my/${orderId}`;
+      const token = this.getToken();
+      // Try the direct orders endpoint first, then fallback to orders/my
+      const url = `${API_BASE_URL}/orders/${orderId}`;
       console.log('🔍 Get order details:', { url, orderId });
+      console.log('🔍 Token for order details:', token ? `${token.substring(0, 20)}...` : 'null');
+      console.log('🔍 Token length:', token?.length || 0);
       
       const response = await fetch(url, {
         method: 'GET',
@@ -181,7 +195,7 @@ export class OrderService {
       } else {
         // Fallback: try to fetch user orders to find the latest one
         console.log('🔍 Fetching user orders to find the created order...');
-        const userOrders = await this.getUserOrders(token);
+        const userOrders = await this.getUserOrders();
         console.log('📋 User orders after creation:', JSON.stringify(userOrders, null, 2));
         
         // Find the most recent order (highest ID)
@@ -252,7 +266,7 @@ export class OrderService {
     }
   }
 
-  static async getAllStatuses(token: string): Promise<StatusDTO[]> {
+  static async getAllStatuses(): Promise<StatusDTO[]> {
     try {
       // For now, return hardcoded statuses since the API doesn't have a direct status endpoint
       // The /api/status endpoint returns system status, not order statuses

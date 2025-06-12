@@ -73,7 +73,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
 
   const fillTestCredentials = () => {
     setFormData({
-      email: 'abc',
+      email: 'admin',
       password: '123456',
     });
     // Clear any existing errors
@@ -115,7 +115,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
                 value={formData.email}
                 onChangeText={(value) => updateFormData('email', value)}
                 error={errors.email}
-                placeholder="Enter your username"
+                placeholder="Enter your username (e.g., admin)"
                 autoCapitalize="none"
               />
 

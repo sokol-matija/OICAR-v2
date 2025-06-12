@@ -25,7 +25,11 @@
       "statusBar": {
         "barStyle": "dark-content",
         "backgroundColor": "#f8f9fa"
-      }
+      },
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

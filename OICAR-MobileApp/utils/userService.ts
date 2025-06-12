@@ -1,9 +1,20 @@
 import { UserDTO, UpdateUserDTO } from '../types/user';
 import { API_BASE_URL } from './apiConfig';
+import { apiService } from './apiService';
 
 export class UserService {
-  static async getUserProfile(token: string): Promise<UserDTO> {
+  // Get token from apiService
+  private static getToken(): string {
+    const token = apiService.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+    return token;
+  }
+
+  static async getUserProfile(): Promise<UserDTO> {
     try {
+      const token = this.getToken();
       const url = `${API_BASE_URL}/users/profile`;
       console.log('🔍 Get user profile:', { url });
       
@@ -50,8 +61,9 @@ export class UserService {
     }
   }
 
-  static async updateUserProfile(userData: UpdateUserDTO, token: string): Promise<void> {
+  static async updateUserProfile(userData: UpdateUserDTO): Promise<void> {
     try {
+      const token = this.getToken();
       const url = `${API_BASE_URL}/users/profile`;
       const payload = {
         Username: userData.username,

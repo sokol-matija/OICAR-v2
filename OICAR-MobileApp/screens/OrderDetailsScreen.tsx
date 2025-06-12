@@ -59,8 +59,8 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
       
       // Load order items, statuses, and products in parallel
       const [orderItems, statuses, products] = await Promise.all([
-        OrderService.getOrderItems(orderId, token),
-        OrderService.getAllStatuses(token),
+        OrderService.getOrderItems(orderId),
+        OrderService.getAllStatuses(),
         ProductService.getAllItems()
       ]);
 
@@ -70,7 +70,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
 
       // Find order info from a previous call or create a minimal one
       // For now, we'll need to get the order info separately
-      const userOrders = await OrderService.getUserOrders(token);
+      const userOrders = await OrderService.getUserOrders();
       const orderInfo = userOrders.find(o => o.idOrder === orderId);
 
       if (!orderInfo) {

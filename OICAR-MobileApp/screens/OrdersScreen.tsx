@@ -56,8 +56,8 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token, onReorderItems }) =>
       
       // Load orders and statuses in parallel (no need to extract user ID from token anymore)
       const [ordersData, statusesData] = await Promise.all([
-        OrderService.getUserOrders(token),
-        OrderService.getAllStatuses(token)
+        OrderService.getUserOrders(),
+                  OrderService.getAllStatuses()
       ]);
 
       setStatuses(statusesData);

@@ -16,6 +16,7 @@ import { CartService } from '../utils/cartService';
 import { ProductService } from '../utils/productService';
 import { OrderService } from '../utils/orderService';
 import { JWTUtils } from '../utils/jwtUtils';
+import apiService from '../utils/apiService';
 
 interface CartScreenProps {
   token?: string;
@@ -48,7 +49,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
     try {
       console.log('🛒 Loading cart...');
       
-      const userCart = await CartService.getUserCart(token);
+      const userCart = await CartService.getUserCart();
       setCart(userCart);
 
       if (userCart && userCart.cartItems.length > 0) {
@@ -102,12 +103,6 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
     console.log('🛒 Cart available:', !!cart);
     console.log('🛒 Cart items count:', cartItems.length);
     
-    if (!token) {
-      console.log('❌ No token available for checkout');
-      Alert.alert('Authentication Required', 'Please log in to checkout');
-      return;
-    }
-
     if (!cart || cartItems.length === 0) {
       console.log('❌ No cart or cart items for checkout');
       Alert.alert('Empty Cart', 'Please add items to your cart before checkout');
@@ -117,53 +112,44 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
     setCheckingOut(true);
 
     try {
-      console.log('🔍 Extracting user ID from token...');
-      const userId = JWTUtils.getUserIdFromToken(token);
+      // Use apiService checkout method which handles token validation and user ID extraction
+      console.log('🛒 Starting checkout via apiService...');
+      const orderResponse = await apiService.checkout() as any;
       
-      if (!userId) {
-        console.log('❌ Could not extract user ID from token');
-        throw new Error('Could not verify user identity');
-      }
+      if (orderResponse && orderResponse.success && orderResponse.data) {
+        const createdOrder = orderResponse.data;
+        console.log('✅ Order created:', JSON.stringify(createdOrder, null, 2));
 
-      console.log('✅ User ID extracted:', userId);
-      console.log('🛒 Creating order from cart...');
-      
-      // Create order from cart
-      const createdOrder = await OrderService.createOrderFromCart(cart, userId, token);
-      console.log('✅ Order created:', JSON.stringify(createdOrder, null, 2));
+        // Update local state - clear cart
+        setCart(null);
+        setCartItems([]);
 
-      // Clear the cart after successful order creation
-      console.log('🧹 Clearing cart...');
-      await OrderService.clearCart(cart.idCart, token);
-      console.log('✅ Cart cleared');
-
-      // Update local state
-      setCart(null);
-      setCartItems([]);
-
-      // Show success message
-      Alert.alert(
-        'Order Placed Successfully! 🎉',
-        `Your order #${createdOrder.idOrder} has been placed. Thank you for your purchase!`,
-        [
-          {
-            text: 'View Orders',
-            onPress: () => {
-              if (onNavigateToOrders) {
-                onNavigateToOrders();
-              } else {
-                console.log('Navigate to orders screen');
+        // Show success message
+        Alert.alert(
+          'Order Placed Successfully! 🎉',
+          `Your order #${createdOrder.idOrder || createdOrder.orderNumber || 'N/A'} has been placed. Thank you for your purchase!`,
+          [
+            {
+              text: 'View Orders',
+              onPress: () => {
+                if (onNavigateToOrders) {
+                  onNavigateToOrders();
+                } else {
+                  console.log('Navigate to orders screen');
+                }
               }
+            },
+            {
+              text: 'Continue Shopping',
+              style: 'cancel'
             }
-          },
-          {
-            text: 'Continue Shopping',
-            style: 'cancel'
-          }
-        ]
-      );
+          ]
+        );
 
-      console.log('✅ Checkout completed successfully');
+        console.log('✅ Checkout completed successfully');
+      } else {
+        throw new Error(orderResponse?.message || 'Order creation failed');
+      }
     } catch (error) {
       console.log('💥 Checkout error:', error);
       Alert.alert(
@@ -194,7 +180,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
           onPress: async () => {
             setUpdatingItem(itemId);
             try {
-              await CartService.removeCartItem(itemId, token);
+              await CartService.removeCartItem(itemId);
               // Reload cart after successful removal
               await loadCart();
               Alert.alert('Success', 'Item removed from cart');
