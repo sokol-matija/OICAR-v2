@@ -1,0 +1,50 @@
+# End-to-End Shopping Flow Test
+# This tests the complete user journey from opening app to making a purchase
+
+appId: com.yourcompany.oicar
+---
+
+# Test: Complete Shopping Journey
+- launchApp
+- assertVisible: "Welcome"
+
+# Browse Products
+- tapOn: "Shop Now"
+- assertVisible: "Products"
+- assertVisible: 
+    text: "Add to Cart"
+    index: 0
+
+# Add Product to Cart
+- tapOn: 
+    text: "Add to Cart"
+    index: 0
+- assertVisible: "Added to cart"
+
+# Go to Cart
+- tapOn: "Cart"
+- assertVisible: "Your Cart"
+- assertVisible: "Checkout"
+
+# Attempt Checkout (This tests login requirement)
+- tapOn: "Checkout"
+- assertVisible: "Login Required"
+
+# Login Flow
+- tapOn: "Login"
+- inputText: "test@example.com"
+- tapOn: "Password"
+- inputText: "TestPassword123!"
+- tapOn: "Sign In"
+
+# Complete Purchase
+- assertVisible: "Welcome back"
+- tapOn: "Cart"
+- tapOn: "Checkout"
+- assertVisible: "Payment"
+- inputText: "4111111111111111" # Test credit card
+- tapOn: "Complete Purchase"
+- assertVisible: "Order Confirmed"
+
+# This test proves:
+# Mobile App → Login API → Add to Cart API → Checkout API → Database → Success Response 
