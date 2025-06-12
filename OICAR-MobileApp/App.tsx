@@ -33,6 +33,7 @@ function AppContent() {
     console.log('🔗 GitHub integration now active!');
     console.log('🛠️ Fixed Vercel root directory configuration!');
     console.log('Testin build trigger error');
+    console.log('Testing build trigger erro v2');
   };
 
   const handleRegisterSuccess = () => {
