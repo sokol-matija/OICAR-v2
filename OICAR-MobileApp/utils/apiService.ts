@@ -1,4 +1,4 @@
-import config from '../config';
+import CONFIG from '../config';
 import { JWTUtils } from './jwtUtils';
 
 // API Service for OICAR Mobile App
@@ -8,7 +8,7 @@ export class ApiService {
   private authToken: string | null = null;
 
   constructor() {
-    this.baseURL = config.API_BASE_URL;
+    this.baseURL = CONFIG.API_BASE_URL;
     this.timeout = 30000; // 30 seconds for Android compatibility
     console.log('🚀 ApiService initialized with base URL:', this.baseURL);
     console.log('🕒 Request timeout set to:', this.timeout, 'ms');
