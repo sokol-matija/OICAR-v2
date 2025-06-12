@@ -11,6 +11,7 @@ import CartScreen from './screens/CartScreen';
 import OrdersScreen from './screens/OrdersScreen';
 import BottomNavigation from './components/BottomNavigation';
 import TestComponent from './components/TestComponent';
+import { AuthProvider, useAuth } from './utils/AuthContext';
 import { UserDTO } from './types/user';
 import { CartService } from './utils/cartService';
 import { JWTUtils } from './utils/jwtUtils';
@@ -18,7 +19,7 @@ import { Alert } from 'react-native';
 
 type Screen = 'test' | 'login' | 'register' | 'home' | 'profile' | 'editProfile' | 'products' | 'cart' | 'orders';
 
-export default function App() {
+function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('login');
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [currentUserProfile, setCurrentUserProfile] = useState<UserDTO | null>(null);
@@ -62,6 +63,9 @@ export default function App() {
   };
 
   const handleReorderItems = async (orderItems: any[]) => {
+    // TODO: Fix cart service integration
+    Alert.alert('Feature Coming Soon', 'Reorder functionality will be available soon!');
+    /*
     if (!authToken) {
       Alert.alert('Authentication Required', 'Please log in to add items to cart');
       return;
@@ -116,6 +120,7 @@ export default function App() {
       console.log('💥 Reorder error:', error);
       Alert.alert('Error', 'Failed to add items to cart. Please try again.');
     }
+    */
   };
 
   // Navigation items for bottom navigation
@@ -273,3 +278,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
+
+// Wrap the main app with AuthProvider
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}

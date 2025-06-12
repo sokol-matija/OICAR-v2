@@ -13,24 +13,28 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
-import { AuthService } from '../utils/authService';
-import { LoginDTO } from '../types/auth';
+import { useAuth } from '../utils/AuthContext';
 
 interface LoginScreenProps {
   onLoginSuccess?: (token: string) => void;
   onNavigateToRegister?: () => void;
 }
 
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
 export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: LoginScreenProps) {
-  const [formData, setFormData] = useState<LoginDTO>({
+  const { login, isLoading } = useAuth();
+  const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
   });
-  const [errors, setErrors] = useState<Partial<LoginDTO>>({});
-  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Partial<LoginFormData>>({});
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<LoginDTO> = {};
+    const newErrors: Partial<LoginFormData> = {};
 
     if (!formData.email.trim()) {
       newErrors.email = 'Username is required';
@@ -51,19 +55,16 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
   const handleLogin = async () => {
     if (!validateForm()) return;
 
-    setLoading(true);
     try {
-      const response = await AuthService.login(formData);
+      await login(formData.email, formData.password);
       Alert.alert('Success', 'Login successful!');
-      onLoginSuccess?.(response.token);
+      onLoginSuccess?.('logged-in');
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'Login failed');
-    } finally {
-      setLoading(false);
     }
   };
 
-  const updateFormData = (field: keyof LoginDTO, value: string) => {
+  const updateFormData = (field: keyof LoginFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -130,7 +131,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
               <CustomButton
                 title="Login"
                 variant="primary"
-                loading={loading}
+                loading={isLoading}
                 onPress={handleLogin}
                 style={styles.loginButton}
               />
