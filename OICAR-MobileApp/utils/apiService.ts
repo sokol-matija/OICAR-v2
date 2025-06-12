@@ -1,4 +1,4 @@
-import CONFIG from '../config';
+import { CONFIG } from '../config';
 import { JWTUtils } from './jwtUtils';
 
 // API Service for OICAR Mobile App
