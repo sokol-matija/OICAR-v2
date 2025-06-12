@@ -35,6 +35,27 @@ This document explains the complete testing infrastructure implemented for the O
 | ✅ Quick to write and maintain | ❌ More time-consuming |
 | **Example**: "Does login function return correct response?" | **Example**: "Can user register → login → add item → checkout?" |
 
+### Our Implementation Strategy
+We implemented **both types** in our project:
+
+#### 🎯 **Unit Tests (16 tests)** - Primary Focus
+- **API Unit Tests**: Test individual controller methods and utilities
+- **Mobile Unit Tests**: Test React Native components and mobile utilities  
+- **Benefits**: Fast, reliable, easy to maintain
+- **Run Time**: < 1 second total
+
+#### 🔗 **Integration Tests (2 tests)** - Secondary Focus  
+- **API Integration**: Test connectivity and framework setup
+- **Mobile Integration**: Test app ↔ API communication patterns
+- **Benefits**: Verify systems work together
+- **Run Time**: 2-5 seconds total
+
+#### 🚀 **End-to-End Tests** - Future Enhancement
+- **Maestro Tests**: Complete user journey testing (shopping flow)
+- **File**: `.maestro/shopping_flow.yaml` 
+- **Benefits**: Test complete user experiences
+- **Run Time**: 30-60 seconds
+
 ## Our Testing Implementation
 
 ### 📁 Project Structure
@@ -67,33 +88,43 @@ OICAR/
 - **Target Framework**: React Native with Expo
 
 ### 📊 Test Summary
-**Total: 14 Working Unit Tests**
+**Total: 18 Working Tests (16 Unit Tests + 2 Integration Tests)**
 
-#### API Tests (8 tests):
+#### API Tests (10 tests):
 
-#### AuthController Tests (3 tests):
+##### Unit Tests (8 tests):
+###### AuthController Tests (3 tests):
 1. `Login_WithValidCredentials_ReturnsOkResult`
 2. `Login_WithInvalidCredentials_ReturnsBadRequest`
 3. `Register_WithValidData_ReturnsOkResult`
 
-#### API Utility Tests (5 tests):
+###### API Utility Tests (5 tests):
 1. `BasicMath_ShouldWork`
 2. `StringOperations_ShouldWork`
 3. `ListOperations_ShouldWork`
 4. `DateTimeOperations_ShouldWork`
 5. `EmailValidation_ShouldWork`
 
-#### Mobile App Tests (6 tests):
+##### Integration Tests (2 tests):
+1. `API_IsReachable_ReturnsHealthCheck` - Tests API connectivity
+2. `Integration_Tests_AreConfigured` - Validates integration test framework
 
-##### Component Tests (2 tests):
+#### Mobile App Tests (8 tests):
+
+##### Unit Tests (6 tests):
+###### Component Tests (2 tests):
 1. `Text renders correctly` - Tests React Native component rendering
 2. `Component renders without crashing` - Tests component stability
 
-##### Mobile Utility Tests (4 tests):
+###### Mobile Utility Tests (4 tests):
 1. `Basic JavaScript operations work` - Math and string operations
 2. `Array operations work` - Mobile app data handling  
 3. `String validation works` - Email validation for mobile
 4. `Date operations work` - Date handling in mobile context
+
+##### Integration Tests (2 tests):
+1. `App can fetch products from API` - Tests mobile → API communication
+2. `App can authenticate user with API` - Tests login flow integration
 
 ## Manual Testing Commands
 
