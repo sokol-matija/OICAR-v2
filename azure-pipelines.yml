@@ -1,0 +1,88 @@
+# Azure DevOps Pipeline for OICAR API
+# Alternative to GitHub Actions
+
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - 'SnjofkaloAPI - Copy/SnjofkaloAPI/*'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  dotNetFramework: '9.0.x'
+  azureSubscription: 'Azure-Subscription-Connection'
+  webAppName: 'oicar-api-ms1749710600'
+  projectPath: 'SnjofkaloAPI - Copy/SnjofkaloAPI'
+
+stages:
+- stage: Build
+  displayName: 'Build and Test'
+  jobs:
+  - job: Build
+    displayName: 'Build job'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET 9.0'
+      inputs:
+        packageType: 'sdk'
+        version: $(dotNetFramework)
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore packages'
+      inputs:
+        command: 'restore'
+        projects: '$(projectPath)/*.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build application'
+      inputs:
+        command: 'build'
+        projects: '$(projectPath)/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Run tests'
+      inputs:
+        command: 'test'
+        projects: '$(projectPath)/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-build --verbosity normal'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish application'
+      inputs:
+        command: 'publish'
+        projects: '$(projectPath)/*.csproj'
+        publishWebProjects: false
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --no-build'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+
+- stage: Deploy
+  displayName: 'Deploy to Azure'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy job'
+    environment: 'Production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure Web App'
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appType: 'webApp'
+              appName: $(webAppName)
+              package: '$(Pipeline.Workspace)/drop/*.zip'
+              deploymentMethod: 'auto' 
