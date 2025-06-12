@@ -31,6 +31,7 @@ function AppContent() {
     console.log('Login successful! Token received:', token ? 'Yes' : 'No');
     console.log('🚀 Auto-deployment test - App updated!');
     console.log('🔗 GitHub integration now active!');
+    console.log('Testin build trigger error');
   };
 
   const handleRegisterSuccess = () => {
