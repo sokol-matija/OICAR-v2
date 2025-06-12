@@ -18,6 +18,8 @@ import { CartService } from './utils/cartService';
 import { JWTUtils } from './utils/jwtUtils';
 import { Alert } from 'react-native';
 
+// Config fix deployed - forcing new build to pick up config.ts changes
+
 type Screen = 'test' | 'login' | 'register' | 'home' | 'profile' | 'editProfile' | 'products' | 'cart' | 'orders' | 'sell';
 
 function AppContent() {
