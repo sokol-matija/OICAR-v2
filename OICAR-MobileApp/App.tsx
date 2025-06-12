@@ -29,6 +29,7 @@ function AppContent() {
     setAuthToken(token);
     setCurrentScreen('home');
     console.log('Login successful! Token received:', token ? 'Yes' : 'No');
+    console.log('🚀 Auto-deployment test - App updated!');
   };
 
   const handleRegisterSuccess = () => {
