@@ -1,18 +1,5 @@
-import { Platform } from 'react-native';
 import { CartDTO, CartItemDTO, AddToCartRequest } from '../types/cart';
-
-// Use different URLs for different platforms
-const getApiBaseUrl = () => {
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:5042/api';
-  } else if (Platform.OS === 'ios') {
-    return 'http://localhost:5042/api';
-  } else {
-    return 'http://localhost:5042/api';
-  }
-};
-
-const API_BASE_URL = getApiBaseUrl();
+import { API_BASE_URL } from './apiConfig';
 
 export class CartService {
   static async getUserCart(token: string): Promise<CartDTO | null> {

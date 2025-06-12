@@ -1,21 +1,5 @@
 import { LoginDTO, RegisterDTO, AuthResponse, AuthError } from '../types/auth';
-import { Platform } from 'react-native';
-
-// Use different URLs for different platforms
-const getApiBaseUrl = () => {
-  if (Platform.OS === 'android') {
-    // Android emulator needs 10.0.2.2 to reach host machine
-    return 'http://10.0.2.2:5042/api';
-  } else if (Platform.OS === 'ios') {
-    // iOS simulator can use localhost
-    return 'http://localhost:5042/api';
-  } else {
-    // Web can use localhost
-    return 'http://localhost:5042/api';
-  }
-};
-
-const API_BASE_URL = getApiBaseUrl();
+import { API_BASE_URL } from './apiConfig';
 
 export class AuthService {
   static async login(loginData: LoginDTO): Promise<AuthResponse> {
