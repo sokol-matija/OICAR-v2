@@ -38,3 +38,4 @@ yarn-error.*
 
 # Configuration files with credentials
 config.ts
+.vercel
