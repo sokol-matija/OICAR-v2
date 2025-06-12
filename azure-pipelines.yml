@@ -49,8 +49,16 @@ stages:
       displayName: 'Run tests'
       inputs:
         command: 'test'
-        projects: '$(projectPath)/*.csproj'
-        arguments: '--configuration $(buildConfiguration) --no-build --verbosity normal'
+        projects: 'SnjofkaloAPI.Tests/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --verbosity normal --logger trx --results-directory $(Build.ArtifactStagingDirectory)/TestResults'
+      
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '$(Build.ArtifactStagingDirectory)/TestResults/*.trx'
+        failTaskOnFailedTests: true
+      condition: always()
 
     - task: DotNetCoreCLI@2
       displayName: 'Publish application'
