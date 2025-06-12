@@ -13,64 +13,6 @@ using SnjofkaloAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load environment variables from .env file if it exists (development)
-if (File.Exists(".env"))
-{
-    foreach (var line in File.ReadAllLines(".env"))
-    {
-        if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#") && line.Contains("="))
-        {
-            var parts = line.Split('=', 2);
-            if (parts.Length == 2)
-            {
-                Environment.SetEnvironmentVariable(parts[0].Trim(), parts[1].Trim());
-            }
-        }
-    }
-}
-
-// Helper method to get configuration with environment variable fallback
-string GetConfigValue(string appSettingsKey, string? envKey = null, string? defaultValue = null)
-{
-    // Try environment variable first (if specified)
-    if (!string.IsNullOrEmpty(envKey))
-    {
-        var envValue = Environment.GetEnvironmentVariable(envKey);
-        if (!string.IsNullOrEmpty(envValue))
-            return envValue;
-    }
-    
-    // Fall back to appsettings.json
-    var configValue = builder.Configuration[appSettingsKey];
-    if (!string.IsNullOrEmpty(configValue))
-        return configValue;
-    
-    // Use default if provided
-    return defaultValue ?? string.Empty;
-}
-
-// Build connection string with environment variable support
-string GetConnectionString()
-{
-    // Try environment variables first for production deployment
-    var server = Environment.GetEnvironmentVariable("DB_SERVER");
-    var database = Environment.GetEnvironmentVariable("DB_NAME");
-    var user = Environment.GetEnvironmentVariable("DB_USER");
-    var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
-    
-    if (!string.IsNullOrEmpty(server) && !string.IsNullOrEmpty(database) && 
-        !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(password))
-    {
-        var trustCert = Environment.GetEnvironmentVariable("DB_TRUST_CERTIFICATE") == "true";
-        return $"Server={server};Database={database};User Id={user};Password={password};MultipleActiveResultSets=true;{(trustCert ? "TrustServerCertificate=true;" : "Encrypt=true;TrustServerCertificate=false;")}Connection Timeout=30;";
-    }
-    
-    // Fall back to appsettings.json connection string
-    return builder.Configuration.GetConnectionString("DefaultConnection") ?? 
-           builder.Configuration.GetConnectionString("LocalConnection") ?? 
-           throw new InvalidOperationException("No database connection string found");
-}
-
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -86,40 +28,10 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Configuration bindings with environment variable support
-var jwtSettings = new JwtSettings
-{
-    SecretKey = GetConfigValue("JwtSettings:SecretKey", "JWT_SECRET_KEY"),
-    Issuer = GetConfigValue("JwtSettings:Issuer", "JWT_ISSUER"),
-    Audience = GetConfigValue("JwtSettings:Audience", "JWT_AUDIENCE"),
-    ExpiryInMinutes = int.Parse(GetConfigValue("JwtSettings:ExpiryInMinutes", "JWT_EXPIRY_MINUTES", "60")),
-    RefreshTokenExpiryInDays = int.Parse(GetConfigValue("JwtSettings:RefreshTokenExpiryInDays", "JWT_REFRESH_TOKEN_EXPIRY_DAYS", "7"))
-};
-
-var apiSettings = new ApiSettings
-{
-    PageSize = int.Parse(GetConfigValue("ApiSettings:PageSize", "API_PAGE_SIZE", "20")),
-    MaxPageSize = int.Parse(GetConfigValue("ApiSettings:MaxPageSize", "API_MAX_PAGE_SIZE", "100")),
-    ApiVersion = GetConfigValue("ApiSettings:ApiVersion", "API_VERSION", "1.0"),
-    EnableSwagger = bool.Parse(GetConfigValue("ApiSettings:EnableSwagger", "ENABLE_SWAGGER", "true")),
-    EnableCors = bool.Parse(GetConfigValue("ApiSettings:EnableCors", "ENABLE_CORS", "true")),
-    AllowedOrigins = GetConfigValue("ApiSettings:AllowedOrigins", "ALLOWED_ORIGINS", "http://localhost:3000")
-        .Split(',', StringSplitOptions.RemoveEmptyEntries)
-        .Select(origin => origin.Trim())
-        .ToArray()
-};
-
-var encryptionSettings = new EncryptionSettings
-{
-    EncryptionKey = GetConfigValue("EncryptionSettings:EncryptionKey", "ENCRYPTION_KEY"),
-    EnableEncryption = bool.Parse(GetConfigValue("EncryptionSettings:EnableEncryption", "ENCRYPTION_ENABLED", "true")),
-    EncryptedFields = builder.Configuration.GetSection("EncryptionSettings:EncryptedFields").Get<List<string>>() ?? new List<string>()
-};
-
-// Register configurations
-builder.Services.AddSingleton(jwtSettings);
-builder.Services.AddSingleton(apiSettings);
-builder.Services.AddSingleton(encryptionSettings);
+// Configuration bindings
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
+builder.Services.Configure<EncryptionSettings>(builder.Configuration.GetSection("EncryptionSettings"));
 
 // Controllers
 builder.Services.AddControllers();
@@ -128,16 +40,16 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IDataEncryptionService, DataEncryptionService>();
 
 // Database with encryption service dependency injection
-var connectionString = GetConnectionString();
 builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
 {
     var encryptionService = serviceProvider.GetRequiredService<IDataEncryptionService>();
 
-    options.UseSqlServer(connectionString);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.AddInterceptors(new EncryptionInterceptor(encryptionService));
 });
 
 // JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
 var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
 
 builder.Services.AddAuthentication(options =>
@@ -168,6 +80,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 // CORS
+var apiSettings = builder.Configuration.GetSection("ApiSettings").Get<ApiSettings>()!;
 if (apiSettings.EnableCors)
 {
     builder.Services.AddCors(options =>
@@ -264,7 +177,8 @@ app.MapControllers();
 // Health check endpoint with encryption status
 app.MapGet("/health", (IDataEncryptionService encryptionService) =>
 {
-    var encryptionSettings = app.Services.GetRequiredService<EncryptionSettings>();
+    var encryptionSettings = app.Services.GetRequiredService<IConfiguration>()
+        .GetSection("EncryptionSettings").Get<EncryptionSettings>();
 
     return new
     {
@@ -273,8 +187,7 @@ app.MapGet("/health", (IDataEncryptionService encryptionService) =>
         EncryptionEnabled = encryptionSettings?.EnableEncryption ?? false,
         GdprCompliant = true,
         MarketplaceEnabled = true,
-        Version = "1.0.0",
-        ConfigurationSource = Environment.GetEnvironmentVariable("DB_SERVER") != null ? "Environment Variables" : "AppSettings"
+        Version = "1.0.0"
     };
 });
 
@@ -332,10 +245,8 @@ try
 {
     Log.Information("Starting Snjofkalo API with comprehensive marketplace functionality");
 
-    // Log configuration source and encryption status on startup
-    var configSource = Environment.GetEnvironmentVariable("DB_SERVER") != null ? "Environment Variables" : "AppSettings";
-    Log.Information("Configuration source: {ConfigSource}", configSource);
-    Log.Information("Database server: {Server}", connectionString.Contains("localhost") ? "Local" : "Azure SQL");
+    // Log encryption status on startup
+    var encryptionSettings = builder.Configuration.GetSection("EncryptionSettings").Get<EncryptionSettings>();
     Log.Information("Data encryption: {EncryptionEnabled}", encryptionSettings?.EnableEncryption ?? false);
 
     if (encryptionSettings?.EnableEncryption == true)
