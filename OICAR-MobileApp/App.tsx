@@ -9,6 +9,7 @@ import EditProfileScreen from './screens/EditProfileScreen';
 import ProductsScreen from './screens/ProductsScreen';
 import CartScreen from './screens/CartScreen';
 import OrdersScreen from './screens/OrdersScreen';
+import CreateItemScreen from './screens/CreateItemScreen';
 import BottomNavigation from './components/BottomNavigation';
 import TestComponent from './components/TestComponent';
 import { AuthProvider, useAuth } from './utils/AuthContext';
@@ -17,7 +18,7 @@ import { CartService } from './utils/cartService';
 import { JWTUtils } from './utils/jwtUtils';
 import { Alert } from 'react-native';
 
-type Screen = 'test' | 'login' | 'register' | 'home' | 'profile' | 'editProfile' | 'products' | 'cart' | 'orders';
+type Screen = 'test' | 'login' | 'register' | 'home' | 'profile' | 'editProfile' | 'products' | 'cart' | 'orders' | 'sell';
 
 function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('login');
@@ -144,6 +145,12 @@ function AppContent() {
       onPress: () => setCurrentScreen('cart'),
     },
     {
+      id: 'sell',
+      icon: '🏪',
+      label: 'Sell',
+      onPress: () => setCurrentScreen('sell'),
+    },
+    {
       id: 'orders',
       icon: '📦',
       label: 'Orders',
@@ -158,7 +165,7 @@ function AppContent() {
   ];
 
   // Screens that should show bottom navigation
-  const screensWithBottomNav = ['home', 'products', 'cart', 'orders', 'profile'];
+  const screensWithBottomNav = ['home', 'products', 'cart', 'sell', 'orders', 'profile'];
   const showBottomNav = authToken && screensWithBottomNav.includes(currentScreen);
 
   const renderScreen = () => {
@@ -213,6 +220,14 @@ function AppContent() {
           <CartScreen 
             token={authToken || undefined}
             onNavigateToOrders={() => setCurrentScreen('orders')}
+          />
+        );
+      case 'sell':
+        return (
+          <CreateItemScreen
+            token={authToken || undefined}
+            onItemCreated={() => setCurrentScreen('products')}
+            onCancel={() => setCurrentScreen('home')}
           />
         );
       case 'orders':

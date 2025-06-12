@@ -11,7 +11,8 @@ import {
   Alert,
   FlatList,
   Dimensions,
-  Modal 
+  Modal,
+  Image 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ItemDTO, ItemCategoryDTO } from '../types/product';
@@ -194,99 +195,182 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     }
   }, []);
 
-  const handleAddToCart = useCallback(async (item: ItemDTO) => {
-    console.log('🛒 === ADD TO CART DEBUG START ===');
-    console.log('🛒 Item to add:', JSON.stringify(item, null, 2));
-    console.log('🛒 Item stock:', item.stockQuantity);
+  const addToCart = async (item: ItemDTO) => {
+    if (!item.idItem) {
+      Alert.alert('Error', 'Invalid item selected');
+      return;
+    }
 
     if (item.stockQuantity <= 0) {
-      console.log('❌ Item out of stock');
       Alert.alert('Out of Stock', 'This item is currently out of stock');
       return;
     }
 
-    setAddingToCart(item.idItem);
+    console.log('🛒 === ADD TO CART DEBUG START ===');
+    console.log('🛒 Item to add:', {
+      idItem: item.idItem,
+      title: item.title,
+      description: item.description,
+      stockQuantity: item.stockQuantity,
+      price: item.price,
+      weight: item.weight,
+      categoryName: (item as any).categoryName,
+      isActive: (item as any).isActive,
+      isFeatured: (item as any).isFeatured,
+      createdAt: (item as any).createdAt,
+      sellerUserID: (item as any).sellerUserID,
+      sellerName: (item as any).sellerName,
+      itemStatus: (item as any).itemStatus,
+      isApproved: (item as any).isApproved,
+      primaryImage: (item as any).primaryImage ? {
+        ...(item as any).primaryImage,
+        imageData: `[${(item as any).primaryImage.imageData?.length || 0} chars]`
+      } : null,
+      imageCount: (item as any).imageCount,
+      isUserGenerated: (item as any).isUserGenerated,
+      itemSource: (item as any).itemSource,
+      isAvailableForPurchase: (item as any).isAvailableForPurchase,
+      statusDisplay: (item as any).statusDisplay
+    });
+    console.log('🛒 Item stock:', item.stockQuantity);
+
     console.log('🛒 Set adding to cart for item:', item.idItem);
+    setAddingToCart(item.idItem);
 
     try {
       console.log('🛒 Adding item to cart directly...');
       console.log('🛒 Item ID:', item.idItem);
       console.log('🛒 Quantity:', 1);
-      
       await CartService.addItemToCart(item.idItem, 1);
-      console.log('✅ Item added successfully');
-      
-      // Update local stock count (optimistic update)
-      console.log('🛒 Updating local stock...');
-      setItems(prevItems => 
-        prevItems.map(prevItem => 
-          prevItem.idItem === item.idItem 
-            ? { ...prevItem, stockQuantity: prevItem.stockQuantity - 1 }
-            : prevItem
-        )
-      );
-
-      // Reload cart to get updated state
-      console.log('🛒 Reloading cart...');
-      await loadUserCart();
-
-      console.log('✅ ADD TO CART COMPLETE');
-      Alert.alert('Success', `${item.title} added to cart!`);
+      Alert.alert('Success', 'Item added to cart!');
     } catch (error) {
       console.log('💥 ADD TO CART ERROR:', error);
-      console.log('💥 Error details:', JSON.stringify(error, null, 2));
-      Alert.alert('Error', `Failed to add item to cart: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.log('💥 Error details:', error);
+      
+      // Parse error message for better user experience
+      let errorMessage = 'Failed to add item to cart';
+      
+      if (error instanceof Error) {
+        const errorString = error.message;
+        
+        // Check for specific error messages
+        if (errorString.includes('You cannot add your own items to cart')) {
+          errorMessage = "You can't add your own items to cart! Try viewing other sellers' items instead.";
+        } else if (errorString.includes('Insufficient stock')) {
+          errorMessage = 'This item is out of stock';
+        } else if (errorString.includes('not found or not available')) {
+          errorMessage = 'This item is no longer available';
+        } else {
+          errorMessage = errorString;
+        }
+      }
+      
+      Alert.alert('Cannot Add to Cart', errorMessage);
     } finally {
       setAddingToCart(null);
       console.log('🛒 === ADD TO CART DEBUG END ===');
     }
-  }, [cart, loadUserCart]);
+  };
 
-  const renderProductItem = useCallback(({ item }: { item: ItemDTO }) => (
-    <View style={styles.productCard}>
-      <View style={styles.productHeader}>
-        <Text style={styles.productTitle}>{item.title || 'Untitled Product'}</Text>
-        <Text style={styles.productPrice}>${(item.price || 0).toFixed(2)}</Text>
-      </View>
+  const renderProduct = ({ item }: { item: ItemDTO }) => {
+    // Debug description and category logging
+    console.log('📝 Description debug:', {
+      itemTitle: item.title,
+      itemDescription: item.description,
+      rawDescription: (item as any).description,
+      apiDescription: (item as any).Description
+    });
+    
+    console.log('🏷️ Category debug:', {
+      itemTitle: item.title,
+      itemCategoryID: item.itemCategoryID,
+      finalCategoryName: (item as any).categoryName,
+      apiCategoryName: (item as any).CategoryName
+    });
+
+    // Get display description - prefer longer description
+    const displayDescription = item.description || 
+      (item as any).Description || 
+      'No description available';
+    
+    // Get the primary image with proper formatting
+    const primaryImage = (item as any).primaryImage;
+    let imageSource = null;
+    
+    if (primaryImage?.imageData) {
+      // Clean the base64 data - remove any data URL prefix if present
+      let imageData = primaryImage.imageData;
+      if (imageData.startsWith('data:image/')) {
+        imageData = imageData.split(',')[1];
+      }
       
-      <Text style={styles.productDescription} numberOfLines={2}>
-        {item.description || 'No description available'}
-      </Text>
-      
-      <View style={styles.productFooter}>
-        <View style={styles.productInfo}>
-          <Text style={styles.productCategory}>
-            {(item as any).categoryName || getCategoryName(item.itemCategoryID || 0)}
-          </Text>
-          <View style={styles.productMeta}>
-            <Text style={[styles.productStock, (item.stockQuantity || 0) > 0 ? styles.inStock : styles.outOfStock]}>
-              {(item.stockQuantity || 0) > 0 ? `${item.stockQuantity} in stock` : 'Out of stock'}
-            </Text>
-            <Text style={styles.productWeight}>{(item.weight || 0).toFixed(1)}kg</Text>
-          </View>
-        </View>
-        
-        <TouchableOpacity
-          style={[
-            styles.addToCartButton,
-            (item.stockQuantity || 0) <= 0 && styles.addToCartButtonDisabled,
-            addingToCart === item.idItem && styles.addToCartButtonLoading
-          ]}
-          onPress={() => handleAddToCart(item)}
-          disabled={(item.stockQuantity || 0) <= 0 || addingToCart === item.idItem}
-        >
-          {addingToCart === item.idItem ? (
-            <ActivityIndicator size="small" color="white" />
+      // Ensure proper base64 format
+      imageSource = { uri: `data:image/jpeg;base64,${imageData}` };
+    }
+
+    return (
+      <View style={styles.productCard}>
+        {/* Image Section */}
+        <View style={styles.imageContainer}>
+          {imageSource ? (
+            <Image 
+              source={imageSource} 
+              style={styles.productImage}
+              resizeMode="cover"
+            />
           ) : (
-            <>
-              <Ionicons name="cart" size={16} color="white" style={styles.cartIcon} />
-              <Text style={styles.addToCartText}>Add to Cart</Text>
-            </>
+            <View style={styles.noImageContainer}>
+              <Ionicons name="camera-outline" size={32} color="#999" />
+              <Text style={styles.noImageText}>No Image</Text>
+            </View>
           )}
-        </TouchableOpacity>
+        </View>
+
+        {/* Content Section */}
+        <View style={styles.productInfo}>
+          <Text style={styles.productTitle}>{item.title}</Text>
+          <Text style={styles.productPrice}>${Number(item.price).toFixed(2)}</Text>
+          
+          {/* Show truncated description if available */}
+          {displayDescription && displayDescription !== 'No description available' && (
+            <Text style={styles.productDescription}>
+              {displayDescription.length > 50 
+                ? `${displayDescription.substring(0, 50)}...` 
+                : displayDescription}
+            </Text>
+          )}
+          
+          <Text style={styles.productCategory}>
+            {(item as any).categoryName || 'Unknown Category'}
+          </Text>
+          
+          <Text style={styles.productStock}>
+            Stock: {item.stockQuantity} available
+          </Text>
+          
+          <TouchableOpacity 
+            style={[
+              styles.addButton, 
+              (item.stockQuantity <= 0 || addingToCart === item.idItem) && styles.addButtonDisabled
+            ]}
+            onPress={() => addToCart(item)}
+            disabled={item.stockQuantity <= 0 || addingToCart === item.idItem}
+          >
+            {addingToCart === item.idItem ? (
+              <ActivityIndicator color="white" size="small" />
+            ) : (
+              <>
+                <Ionicons name="cart" size={16} color="white" />
+                <Text style={styles.addButtonText}>
+                  {item.stockQuantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  ), [getCategoryName, addingToCart, handleAddToCart]);
+    );
+           };
 
   if (loading) {
     return (
@@ -351,7 +435,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
 
         <FlatList
           data={filteredItems}
-          renderItem={renderProductItem}
+          renderItem={renderProduct}
           keyExtractor={(item, index) => `product-${item.idItem || `fallback-${index}`}`}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -551,7 +635,6 @@ const styles = StyleSheet.create({
   },
   productCard: {
     backgroundColor: 'white',
-    padding: 16,
     marginBottom: 12,
     borderRadius: 8,
     borderWidth: 1,
@@ -564,19 +647,41 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+    overflow: 'hidden',
   },
-  productHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+  imageContainer: {
+    width: '100%',
+    height: 200,
+    backgroundColor: '#f8f9fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
+  },
+  noImageContainer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#f8f9fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  noImageText: {
+    fontSize: 32,
+    color: '#dee2e6',
     marginBottom: 8,
   },
+  productInfo: {
+    padding: 16,
+  },
   productTitle: {
-    flex: 1,
     fontSize: 18,
     fontWeight: '600',
     color: '#212529',
-    marginRight: 8,
+    marginBottom: 8,
   },
   productPrice: {
     fontSize: 18,
@@ -589,39 +694,18 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 12,
   },
-  productFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-  productInfo: {
-    flex: 1,
-  },
   productCategory: {
     fontSize: 12,
     color: '#007bff',
     fontWeight: '500',
     textTransform: 'uppercase',
-  },
-  productMeta: {
-    alignItems: 'flex-end',
+    marginBottom: 4,
   },
   productStock: {
     fontSize: 12,
     fontWeight: '500',
-    marginBottom: 2,
   },
-  inStock: {
-    color: '#28a745',
-  },
-  outOfStock: {
-    color: '#dc3545',
-  },
-  productWeight: {
-    fontSize: 11,
-    color: '#666',
-  },
-  addToCartButton: {
+  addButton: {
     backgroundColor: '#007bff',
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -629,16 +713,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  addToCartButtonDisabled: {
+  addButtonDisabled: {
     backgroundColor: '#ccc',
   },
-  addToCartButtonLoading: {
-    backgroundColor: '#007bff',
-  },
-  cartIcon: {
-    marginRight: 8,
-  },
-  addToCartText: {
+  addButtonText: {
     color: 'white',
     fontWeight: '600',
   },

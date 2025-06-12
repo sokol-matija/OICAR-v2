@@ -309,6 +309,39 @@ export class ApiService {
     });
   }
 
+  // Create a new seller item
+  async createSellerItem(itemData: any) {
+    console.log('🏪 === APISERVICE CREATE SELLER ITEM START ===');
+    console.log('🏪 Item data:', JSON.stringify(itemData, null, 2));
+    
+    // Validate token
+    if (!this.authToken) {
+      console.log('❌ No auth token for item creation');
+      throw new Error('Authentication required. Please log in again.');
+    }
+
+    if (!this.isTokenValid()) {
+      console.log('❌ Invalid or expired token for item creation');
+      throw new Error('Session expired. Please log in again.');
+    }
+
+    try {
+      const response = await this.makeRequest('/items/seller', {
+        method: 'POST',
+        body: JSON.stringify(itemData),
+      });
+
+      console.log('✅ Item created successfully:', response);
+      console.log('🏪 === APISERVICE CREATE SELLER ITEM END ===');
+      return response;
+      
+    } catch (error) {
+      console.log('💥 Create item failed:', error);
+      console.log('🏪 === APISERVICE CREATE SELLER ITEM END ===');
+      throw error;
+    }
+  }
+
   // Checkout - create order from current cart
   async checkout() {
     console.log('🛒 === APISERVICE CHECKOUT START ===');

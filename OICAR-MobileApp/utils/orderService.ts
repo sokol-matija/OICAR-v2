@@ -68,7 +68,7 @@ export class OrderService {
     try {
       const token = this.getToken();
       // Try the direct orders endpoint first, then fallback to orders/my
-      const url = `${API_BASE_URL}/orders/${orderId}`;
+      const url = `${API_BASE_URL}/orders/my/${orderId}`;
       console.log('🔍 Get order details:', { url, orderId });
       console.log('🔍 Token for order details:', token ? `${token.substring(0, 20)}...` : 'null');
       console.log('🔍 Token length:', token?.length || 0);

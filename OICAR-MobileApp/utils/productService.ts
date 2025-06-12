@@ -23,32 +23,52 @@ export class ProductService {
       }
 
       const response_data = await response.json();
-      console.log('🔍 Full API response:', JSON.stringify(response_data, null, 2));
+      // Log API response summary (avoiding large image data)
+      console.log('🔍 API response summary:', {
+        success: response_data.success,
+        itemCount: response_data.data?.data?.length || 0,
+        hasData: !!response_data.data
+      });
       
-      // Handle the new API response format
+      // Handle the new API response format - items are in response_data.data.data
       const data = response_data.data?.data || response_data.data || response_data;
       console.log(`✅ Loaded ${data.length} items`);
-      console.log('🔍 First item raw data:', JSON.stringify(data[0], null, 2));
+      // Log first item summary (avoiding image blob)
+      if (data[0]) {
+        const firstItem = { ...data[0] };
+        if (firstItem.primaryImage?.imageData) {
+          firstItem.primaryImage.imageData = `[${firstItem.primaryImage.imageData.length} chars]`;
+        }
+        console.log('🔍 First item summary:', JSON.stringify(firstItem, null, 2));
+      }
       
-      // Convert backend naming to frontend naming with safety checks
+      // Map to the correct field names from your API response
       return data.map((item: any, index: number) => {
         const mappedItem = {
-          idItem: item.IDItem || item.idItem || item.Id || item.id,
-          itemCategoryID: item.ItemCategoryID || item.itemCategoryID || item.CategoryID || item.categoryId,
-          title: item.Title || item.title || 'Untitled Product',
-          description: item.Description || item.description || 'No description available',
-          stockQuantity: item.StockQuantity ?? item.stockQuantity ?? 0,
-          price: Number(item.Price ?? item.price ?? 0),
-          weight: Number(item.Weight ?? item.weight ?? 0),
+          idItem: item.idItem || item.IDItem || item.Id || item.id,
+          itemCategoryID: item.itemCategoryID || item.ItemCategoryID || item.CategoryID || item.categoryId,
+          title: item.title || item.Title || 'Untitled Product',
+          description: item.description || item.Description || '',
+          stockQuantity: item.stockQuantity ?? item.StockQuantity ?? 0,
+          price: Number(item.price ?? item.Price ?? 0),
+          weight: Number(item.weight ?? item.Weight ?? 0),
+          // Preserve all additional fields from API
+          ...item
         };
         
-        // Log any items with undefined IDs for debugging
-        if (!mappedItem.idItem) {
-          console.log(`⚠️ Item ${index} has undefined ID:`, JSON.stringify(item, null, 2));
-        }
+        // Debug just the essential info to avoid blob data
+        console.log(`🔍 Mapped item ${index}:`, {
+          id: mappedItem.idItem,
+          title: mappedItem.title,
+          price: mappedItem.price,
+          stock: mappedItem.stockQuantity,
+          description: mappedItem.description?.substring(0, 30) || 'None',
+          categoryName: (mappedItem as any).categoryName || 'None',
+          hasImage: !!(mappedItem as any).primaryImage?.imageData
+        });
         
         return mappedItem;
-      }).filter((item: any) => item.idItem !== undefined && item.idItem !== null); // Filter out invalid items
+      }).filter((item: any) => item.idItem !== undefined && item.idItem !== null);
     } catch (error) {
       console.log('💥 Get items exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to load items');
