@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OICAR CORS Test</title>
+</head>
+<body>
+    <h1>OICAR API CORS Test</h1>
+    <button onclick="testCORS()">Test API Connection</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCORS() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                // Test the health endpoint
+                const response = await fetch('https://oicar-api-ms1749710600.azurewebsites.net/health', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <h3 style="color: green;">✅ CORS Working!</h3>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3 style="color: orange;">⚠️ Response Error</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Status Text: ${response.statusText}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3 style="color: red;">❌ CORS Error</h3>
+                    <p>${error.message}</p>
+                    <p>This indicates CORS is still not properly configured.</p>
+                `;
+            }
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            console.log('🧪 CORS Test page loaded');
+            console.log('📍 Origin:', window.location.origin);
+        };
+    </script>
+</body>
+</html> 
