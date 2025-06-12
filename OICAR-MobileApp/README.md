@@ -162,3 +162,6 @@ You can override database settings using environment variables:
 ### Permission Issues
 - Make sure the init script is executable: `chmod +x init-database.sh`
 - Check Docker container logs: `docker logs oicar-sqlserver`
+
+### Test
+- New cdci test 

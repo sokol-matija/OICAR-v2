@@ -5,6 +5,7 @@ using SnjofkaloAPI.Models.DTOs.Responses;
 using SnjofkaloAPI.Services.Interfaces;
 using System.Security.Claims;
 
+// CI/CD Pipeline Test - Testing GitHub Actions deployment workflow
 namespace SnjofkaloAPI.Controllers
 {
     [ApiController]
