@@ -5,6 +5,7 @@ interface CustomButtonProps extends TouchableOpacityProps {
   title: string;
   variant?: 'primary' | 'success' | 'danger' | 'outline';
   loading?: boolean;
+  testID?: string;
 }
 
 export default function CustomButton({ 
@@ -13,6 +14,7 @@ export default function CustomButton({
   loading = false, 
   style, 
   disabled,
+  testID,
   ...props 
 }: CustomButtonProps) {
   const getButtonStyle = () => {
@@ -34,6 +36,7 @@ export default function CustomButton({
 
   return (
     <TouchableOpacity
+      testID={testID}
       style={[
         styles.button,
         getButtonStyle(),

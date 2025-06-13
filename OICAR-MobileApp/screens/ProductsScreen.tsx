@@ -349,6 +349,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
           </Text>
           
           <TouchableOpacity 
+            testID={`add-to-cart-${item.idItem}`}
             style={[
               styles.addButton, 
               (item.stockQuantity <= 0 || addingToCart === item.idItem) && styles.addButtonDisabled
@@ -393,6 +394,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
         <View style={styles.searchInputContainer}>
           <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
           <TextInput
+            testID="products-search-input"
             style={styles.searchInput}
             placeholder="Search products..."
             value={searchQuery}
@@ -404,7 +406,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
             <ActivityIndicator size="small" color="#007bff" style={styles.searchLoader} />
           )}
         </View>
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearchSubmit}>
+        <TouchableOpacity testID="products-search-button" style={styles.searchButton} onPress={handleSearchSubmit}>
           <Text style={styles.searchButtonText}>Search</Text>
         </TouchableOpacity>
       </View>
@@ -412,6 +414,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       {/* Category Filter */}
       <View style={styles.filterContainer}>
         <TouchableOpacity 
+          testID="category-filter-dropdown"
           style={styles.categorySelector}
           onPress={() => setShowCategoryDropdown(true)}
         >
@@ -475,13 +478,14 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
           <View style={styles.dropdownContainer}>
             <View style={styles.dropdownHeader}>
               <Text style={styles.dropdownTitle}>Select Category</Text>
-              <TouchableOpacity onPress={() => setShowCategoryDropdown(false)}>
+              <TouchableOpacity testID="category-dropdown-close" onPress={() => setShowCategoryDropdown(false)}>
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
             
             <ScrollView style={styles.dropdownList}>
               <TouchableOpacity
+                testID="category-all-products"
                 style={[
                   styles.dropdownItem,
                   selectedCategory === null && styles.dropdownItemSelected
@@ -501,6 +505,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
               
               {categories.map((category) => (
                 <TouchableOpacity
+                  testID={`category-${category.idItemCategory}`}
                   key={category.idItemCategory}
                   style={[
                     styles.dropdownItem,

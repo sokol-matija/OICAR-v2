@@ -73,7 +73,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
 
   const fillTestCredentials = () => {
     setFormData({
-      email: 'admin',
+      email: 'msokol',
       password: '123456',
     });
     // Clear any existing errors
@@ -111,6 +111,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
             {/* Card Body */}
             <View style={styles.cardBody}>
               <CustomInput
+                testID="login-username-input"
                 label="Username"
                 value={formData.email}
                 onChangeText={(value) => updateFormData('email', value)}
@@ -120,6 +121,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
               />
 
               <CustomInput
+                testID="login-password-input"
                 label="Password"
                 value={formData.password}
                 onChangeText={(value) => updateFormData('password', value)}
@@ -129,6 +131,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
               />
 
               <CustomButton
+                testID="login-submit-button"
                 title="Login"
                 variant="primary"
                 loading={isLoading}
@@ -137,6 +140,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
               />
 
               <TouchableOpacity
+                testID="fill-test-credentials-button"
                 style={styles.testButton}
                 onPress={fillTestCredentials}
               >
@@ -148,7 +152,7 @@ export default function LoginScreen({ onLoginSuccess, onNavigateToRegister }: Lo
             <View style={styles.cardFooter}>
               <View style={styles.footerTextContainer}>
                 <Text style={styles.footerText}>Don't have an account? </Text>
-                <TouchableOpacity onPress={onNavigateToRegister}>
+                <TouchableOpacity testID="navigate-to-register-button" onPress={onNavigateToRegister}>
                   <Text style={styles.linkText}>Register here</Text>
                 </TouchableOpacity>
               </View>

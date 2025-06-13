@@ -4,13 +4,15 @@ import { TextInput, Text, View, TextInputProps, StyleSheet } from 'react-native'
 interface CustomInputProps extends TextInputProps {
   label: string;
   error?: string;
+  testID?: string;
 }
 
-export default function CustomInput({ label, error, style, ...props }: CustomInputProps) {
+export default function CustomInput({ label, error, style, testID, ...props }: CustomInputProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
+        testID={testID}
         style={[
           styles.input,
           error ? styles.inputError : styles.inputNormal,

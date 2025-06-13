@@ -108,6 +108,7 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
                 <View style={styles.errorContainer}>
                   <Text style={styles.errorText}>{error}</Text>
                   <CustomButton
+                    testID="profile-retry-button"
                     title="Retry"
                     variant="primary"
                     onPress={loadUserProfile}
@@ -153,6 +154,7 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
 
                   <View style={styles.buttonSection}>
                     <CustomButton
+                      testID="edit-profile-button"
                       title="Edit Profile"
                       variant="primary"
                       onPress={handleEditProfile}
@@ -160,6 +162,7 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
                     />
 
                     <CustomButton
+                      testID="logout-button"
                       title="Logout"
                       variant="outline"
                       onPress={onLogout}
@@ -171,6 +174,7 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
                 <View style={styles.errorContainer}>
                   <Text style={styles.errorText}>No profile data available</Text>
                   <CustomButton
+                    testID="profile-retry-button-2"
                     title="Retry"
                     variant="primary"
                     onPress={loadUserProfile}

@@ -126,6 +126,7 @@ export default function RegisterScreen({ onRegisterSuccess, onNavigateToLogin }:
             {/* Card Body */}
             <View style={styles.cardBody}>
               <CustomInput
+                testID="register-username-input"
                 label="Username"
                 value={formData.username}
                 onChangeText={(value) => updateFormData('username', value)}
@@ -135,6 +136,7 @@ export default function RegisterScreen({ onRegisterSuccess, onNavigateToLogin }:
               />
 
               <CustomInput
+                testID="register-email-input"
                 label="Email"
                 value={formData.email}
                 onChangeText={(value) => updateFormData('email', value)}
@@ -145,6 +147,7 @@ export default function RegisterScreen({ onRegisterSuccess, onNavigateToLogin }:
               />
 
               <CustomInput
+                testID="register-password-input"
                 label="Password"
                 value={formData.password}
                 onChangeText={(value) => updateFormData('password', value)}
@@ -154,6 +157,7 @@ export default function RegisterScreen({ onRegisterSuccess, onNavigateToLogin }:
               />
 
               <CustomInput
+                testID="register-firstname-input"
                 label="First Name"
                 value={formData.firstName}
                 onChangeText={(value) => updateFormData('firstName', value)}
@@ -163,6 +167,7 @@ export default function RegisterScreen({ onRegisterSuccess, onNavigateToLogin }:
               />
 
               <CustomInput
+                testID="register-lastname-input"
                 label="Last Name"
                 value={formData.lastName}
                 onChangeText={(value) => updateFormData('lastName', value)}
@@ -172,6 +177,7 @@ export default function RegisterScreen({ onRegisterSuccess, onNavigateToLogin }:
               />
 
               <CustomInput
+                testID="register-phone-input"
                 label="Phone Number"
                 value={formData.phoneNumber}
                 onChangeText={(value) => updateFormData('phoneNumber', value)}
@@ -181,6 +187,7 @@ export default function RegisterScreen({ onRegisterSuccess, onNavigateToLogin }:
               />
 
               <CustomButton
+                testID="register-submit-button"
                 title="Register"
                 variant="success"
                 loading={loading}
@@ -193,7 +200,7 @@ export default function RegisterScreen({ onRegisterSuccess, onNavigateToLogin }:
             <View style={styles.cardFooter}>
               <View style={styles.footerTextContainer}>
                 <Text style={styles.footerText}>Already have an account? </Text>
-                <TouchableOpacity onPress={onNavigateToLogin}>
+                <TouchableOpacity testID="navigate-to-login-button" onPress={onNavigateToLogin}>
                   <Text style={styles.linkText}>Login here</Text>
                 </TouchableOpacity>
               </View>

@@ -261,6 +261,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
         
         <View style={styles.cartItemActions}>
           <TouchableOpacity
+            testID={`edit-quantity-${item.idCartItem}`}
             style={styles.actionButton}
             onPress={() => handleUpdateQuantity(item.idCartItem, item.quantity)}
             disabled={updatingItem === item.idCartItem}
@@ -273,6 +274,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
           </TouchableOpacity>
           
           <TouchableOpacity
+            testID={`remove-item-${item.idCartItem}`}
             style={[styles.actionButton, styles.removeButton]}
             onPress={() => handleRemoveItem(item.itemID)}
             disabled={updatingItem === item.idCartItem}
@@ -355,6 +357,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
         </View>
         
         <TouchableOpacity 
+          testID="checkout-button"
           style={[styles.checkoutButton, checkingOut && styles.checkoutButtonDisabled]}
           onPress={handleCheckout}
           disabled={checkingOut}

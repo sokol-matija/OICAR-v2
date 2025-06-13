@@ -19,6 +19,7 @@ export default function BottomNavigation({ items, activeItem }: BottomNavigation
       <View style={styles.navigation}>
         {items.map((item) => (
           <TouchableOpacity
+            testID={`nav-tab-${item.id}`}
             key={item.id}
             style={[
               styles.navItem,

@@ -150,6 +150,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token, onReorderItems }) =>
 
   const renderOrderItem = ({ item }: { item: OrderWithStatus }) => (
     <TouchableOpacity 
+      testID={`order-item-${item.idOrder}`}
       style={styles.orderCard}
       onPress={() => {
         console.log('🔍 Order item clicked:', { id: item.idOrder, total: item.totalAmount });
