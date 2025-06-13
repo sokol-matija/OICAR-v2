@@ -87,11 +87,33 @@ if (apiSettings.EnableCors)
     {
         options.AddPolicy("AllowSpecificOrigins", policy =>
         {
-            policy.WithOrigins(apiSettings.AllowedOrigins)
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials()
-                  .SetPreflightMaxAge(TimeSpan.FromSeconds(2520)); // Cache preflight for 42 minutes
+            if (apiSettings.AllowVercelDomains)
+            {
+                policy.SetIsOriginAllowed(origin =>
+                {
+                    // Allow configured origins
+                    if (apiSettings.AllowedOrigins.Contains(origin))
+                        return true;
+                    
+                    // Allow all vercel.app domains
+                    if (origin.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase))
+                        return true;
+                    
+                    return false;
+                })
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .SetPreflightMaxAge(TimeSpan.FromSeconds(2520));
+            }
+            else
+            {
+                policy.WithOrigins(apiSettings.AllowedOrigins)
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials()
+                      .SetPreflightMaxAge(TimeSpan.FromSeconds(2520));
+            }
         });
         
         // Add a more permissive policy for development
