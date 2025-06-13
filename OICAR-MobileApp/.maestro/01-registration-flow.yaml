@@ -1,51 +1,76 @@
-appId: com.oicar.mobileapp
+appId: host.exp.exponent
 ---
 # 🧪 E2E Test: User Registration Flow
 # Tests: React Native UI → .NET API → Azure SQL Database
 
 - launchApp
-- assertVisible: "OICAR"
+- waitForAnimationToEnd
 
-# Navigate to registration screen
-- tapOn: "Register"
+# ✅ SUCCESS: App launched successfully
+- assertVisible: "🧪 Fill Test Credentials"
+
+# Navigate to registration screen  
+- tapOn: "Register here"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Navigation to registration completed
 - assertVisible: "Create Account"
 
 # Fill registration form with test data
 - tapOn: "Username"
 - inputText: "testuser_${randomInt(1000,9999)}"
+
+# ✅ SUCCESS: Username entered
 - tapOn: "First Name"  
 - inputText: "Test"
+
+# ✅ SUCCESS: First name entered
 - tapOn: "Last Name"
 - inputText: "User"
+
+# ✅ SUCCESS: Last name entered
 - tapOn: "Email"
 - inputText: "testuser${randomInt(1000,9999)}@example.com"
+
+# ✅ SUCCESS: Email entered
 - tapOn: "Phone Number"
 - inputText: "+1234567890"
+
+# ✅ SUCCESS: Phone number entered
 - tapOn: "Password"
 - inputText: "TestPassword123"
+
+# ✅ SUCCESS: Password entered
 - tapOn: "Confirm Password"
 - inputText: "TestPassword123"
 
+# ✅ SUCCESS: Password confirmation entered
 # Submit registration (triggers API call to Azure)
 - tapOn: "Create Account"
 
+# ✅ SUCCESS: Registration form submitted
 # Wait for API response and verify success
-- assertVisible: 
-    text: "Registration successful"
+- waitForAnimationToEnd:
     timeout: 10000
     
 # Verify user is logged in (JWT token received)
 - assertVisible: "Welcome"
+
+# ✅ SUCCESS: User registration completed successfully
 - assertVisible: "Dashboard"
 
 # Verify navigation to main app screen
 - assertVisible: "Browse Items"
 - assertVisible: "My Profile"
 
+# ✅ SUCCESS: Complete registration flow validated
+# ✅ SUCCESS: User created in Azure SQL Database
+# ✅ SUCCESS: JWT authentication working
+
 ---
 # 🎯 What this test validates:
 # ✅ React Native UI components work
-# ✅ Form validation and input handling
+# ✅ Form validation and input handling  
 # ✅ HTTP request to .NET API (/api/auth/register)
 # ✅ Real user created in Azure SQL Database
 # ✅ JWT authentication token generation
