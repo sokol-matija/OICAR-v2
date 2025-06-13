@@ -8,5 +8,6 @@
         public bool EnableSwagger { get; set; } = true;
         public bool EnableCors { get; set; } = true;
         public string[] AllowedOrigins { get; set; } = Array.Empty<string>();
+        public bool AllowVercelDomains { get; set; } = false;
     }
 }
