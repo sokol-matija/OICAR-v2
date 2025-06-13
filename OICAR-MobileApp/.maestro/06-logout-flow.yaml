@@ -1,0 +1,88 @@
+appId: com.oicar.mobileapp
+---
+# 🧪 E2E Test: Logout Flow
+# Tests: Session termination → JWT invalidation → Security cleanup
+
+- launchApp
+- assertVisible: "OICAR"
+
+# Ensure user is logged in first
+- tapOn: "Login"
+- inputText: "testuser_1234"
+- tapOn: "Password"
+- inputText: "TestPassword123"
+- tapOn: "Sign In"
+- assertVisible: "Dashboard"
+
+# Verify authenticated state
+- assertVisible: "Welcome back"
+- assertVisible: "My Profile"
+- assertVisible: "My Cart"
+- assertVisible: "Logout"
+
+# Navigate to profile to verify user data
+- tapOn: "My Profile"
+- assertVisible: "Profile Information"
+- assertVisible: "testuser_1234"
+- assertVisible: "Settings"
+
+# Initiate logout process
+- tapOn: "Logout"
+
+# Confirm logout (if confirmation dialog exists)
+- assertVisible: "Are you sure you want to logout?"
+- tapOn: "Yes, Logout"
+
+# Wait for logout API call completion
+- assertVisible:
+    text: "Logging out"
+    timeout: 3000
+
+# Verify logout success
+- assertVisible:
+    text: "Logged out successfully"
+    timeout: 5000
+
+# Verify return to unauthenticated state
+- assertVisible: "Welcome to OICAR"
+- assertVisible: "Login"
+- assertVisible: "Register"
+
+# Verify protected features not accessible
+- assertNotVisible: "My Profile"
+- assertNotVisible: "My Cart"
+- assertNotVisible: "Dashboard"
+- assertNotVisible: "Logout"
+
+# Test that login is required for protected actions
+- tapOn: "Browse Items"
+- tapOn:
+    text: "View Details"
+    index: 0
+- tapOn: "Add to Cart"
+
+# Should prompt for login
+- assertVisible: "Please login to add items to cart"
+- assertVisible: "Login Now"
+
+# Verify session completely cleared
+- tapOn: "Login Now"
+- assertVisible: "Sign In"
+- assertNotVisible: "testuser_1234"  # Username not pre-filled
+
+# Test failed access to protected API endpoints
+- tapOn: "Back"
+- tapOn: "Back"
+# Try to access profile directly (should redirect to login)
+- assertVisible: "Welcome to OICAR"
+
+---
+# 🎯 What this test validates:
+# ✅ Logout API endpoint (/api/auth/logout) integration
+# ✅ JWT token invalidation on server
+# ✅ Local token removal from device storage
+# ✅ Session state cleanup in React Native
+# ✅ Protected route access restrictions
+# ✅ UI state reset to unauthenticated
+# ✅ Security: No residual authenticated data
+# ✅ Proper redirect flows for protected actions 

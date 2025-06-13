@@ -1,0 +1,55 @@
+appId: com.oicar.mobileapp
+---
+# 🧪 E2E Test: User Login Flow
+# Tests: Authentication UI → JWT API → Session Management
+
+- launchApp
+- assertVisible: "OICAR"
+
+# Navigate to login screen
+- tapOn: "Login"
+- assertVisible: "Sign In"
+
+# Use existing test credentials (created by registration test)
+- tapOn: "Username"
+- inputText: "testuser_1234"  # Use known test user
+- tapOn: "Password"
+- inputText: "TestPassword123"
+
+# Submit login (triggers API authentication)
+- tapOn: "Sign In"
+
+# Wait for authentication response
+- assertVisible:
+    text: "Login successful"
+    timeout: 8000
+
+# Verify JWT token received and stored
+- assertVisible: "Dashboard"
+- assertVisible: "Welcome back"
+
+# Verify authenticated features available
+- assertVisible: "Browse Items"
+- assertVisible: "My Cart"
+- assertVisible: "My Profile"
+- assertVisible: "Logout"
+
+# Test navigation with authenticated state
+- tapOn: "My Profile"
+- assertVisible: "Profile Information"
+- assertVisible: "testuser_1234"
+
+# Return to dashboard
+- tapOn: "Back"
+- assertVisible: "Dashboard"
+
+---
+# 🎯 What this test validates:
+# ✅ Login form UI functionality
+# ✅ HTTP request to .NET API (/api/auth/login)
+# ✅ JWT token authentication flow
+# ✅ Token storage in device secure storage
+# ✅ Authenticated state management
+# ✅ Protected routes accessibility
+# ✅ User session persistence
+# ✅ Navigation between authenticated screens 

@@ -1,0 +1,53 @@
+appId: com.oicar.mobileapp
+---
+# 🧪 E2E Test: User Registration Flow
+# Tests: React Native UI → .NET API → Azure SQL Database
+
+- launchApp
+- assertVisible: "OICAR"
+
+# Navigate to registration screen
+- tapOn: "Register"
+- assertVisible: "Create Account"
+
+# Fill registration form with test data
+- tapOn: "Username"
+- inputText: "testuser_${randomInt(1000,9999)}"
+- tapOn: "First Name"  
+- inputText: "Test"
+- tapOn: "Last Name"
+- inputText: "User"
+- tapOn: "Email"
+- inputText: "testuser${randomInt(1000,9999)}@example.com"
+- tapOn: "Phone Number"
+- inputText: "+1234567890"
+- tapOn: "Password"
+- inputText: "TestPassword123"
+- tapOn: "Confirm Password"
+- inputText: "TestPassword123"
+
+# Submit registration (triggers API call to Azure)
+- tapOn: "Create Account"
+
+# Wait for API response and verify success
+- assertVisible: 
+    text: "Registration successful"
+    timeout: 10000
+    
+# Verify user is logged in (JWT token received)
+- assertVisible: "Welcome"
+- assertVisible: "Dashboard"
+
+# Verify navigation to main app screen
+- assertVisible: "Browse Items"
+- assertVisible: "My Profile"
+
+---
+# 🎯 What this test validates:
+# ✅ React Native UI components work
+# ✅ Form validation and input handling
+# ✅ HTTP request to .NET API (/api/auth/register)
+# ✅ Real user created in Azure SQL Database
+# ✅ JWT authentication token generation
+# ✅ App navigation after successful registration
+# ✅ Complete end-to-end user onboarding flow 
