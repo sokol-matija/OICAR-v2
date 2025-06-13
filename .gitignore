@@ -395,3 +395,56 @@ Temporary Items
 *.userosscache
 *.sln.docstates 
 snjofkalo-ui/.angular/
+
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+# Only exists if Bazel was run
+/bazel-out
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+/.angular/
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel

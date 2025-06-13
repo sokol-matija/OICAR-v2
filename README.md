@@ -289,3 +289,41 @@ npm start -- --clear
 *Mobile Status: ✅ Deployed via Vercel*  
 *Tests: 18 automated, 100% passing*  
 *Database: ✅ Azure SQL with encrypted data*
+
+# OICAR UI - Angular Frontend
+
+This is the Angular frontend for the OICAR marketplace application.
+
+## 🚀 Live Demo
+- **Production**: Auto-deployed via Vercel
+- **API**: Connected to Azure-hosted backend
+
+## 🛠️ Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+
+# Build for production
+npm run build
+```
+
+## 📦 Deployment
+
+This project is automatically deployed to Vercel on every push to main branch.
+
+## 🔗 API Configuration
+
+The app connects to the live Azure API:
+- **API Endpoint**: `https://oicar-api-ms1749710600.azurewebsites.net/api`
+- **CORS**: Configured to allow all Vercel.app domains
+
+## 🏗️ Built With
+
+- Angular 17
+- Angular Material
+- TypeScript
+- SCSS
