@@ -1,55 +1,67 @@
-# 🛍️ OICAR E-commerce Platform
+# OICAR E-commerce Platform
 
-A modern, full-stack e-commerce platform built with .NET 9.0 API, React Native mobile app, and comprehensive testing infrastructure. Features automated CI/CD deployment to Azure and Vercel with 18 automated tests ensuring quality.
+Okay, so my team and I have made a full-stack e-commerce platform that we have built with .NET 9.0 API. We have also used React Native Mobile App and comprehensive testing infrastructure. This also features automated CI / CD deployment to Azure and Vercel with 18 automated tests.
 
-## 🏗️ **Architecture Overview**
+### Team:  
+Matija Sokol, Dominik Despot, Dominik Cirko  
 
-- **🔧 .NET 9.0 API**: RESTful backend with Entity Framework + Azure SQL
-- **📱 React Native Mobile App**: Cross-platform Expo application  
-- **🌐 ASP.NET Web Portal**: Administrative interface
-- **☁️ Cloud Infrastructure**: Azure App Service + Azure SQL Database
-- **🚀 CI/CD Pipeline**: GitHub Actions → Azure + Vercel deployment
-- **🧪 Automated Testing**: 18 tests (API + Mobile) with deployment protection
+## **Architecture Overview**
 
-## 🌐 **Live Deployment URLs**
+We have used .NET 9.0 API using RESTful backend with Entity Framework and Azure SQL.    
+  
+For the mobile app we have used React Native expo application that is cross platformed.
+
+For CI/CD pipeline we have used GitHub actions paired with Azure and Vercel deployment.
+The deployment should trigger once we push the code to the to GitHub.
+
+The web frontend is an angular application using angular 17 with all the best modern practices.
+
+For start I have first dockerized the Microsoft SQL database but we have later moved on to using a live database that I have deployed on on Azure
+
+
+## **Live Deployment URLs**
 
 ### **Production Endpoints:**
-- **API Backend**: `https://oicar-api-ms1749710600.azurewebsites.net`
-- **API Health Check**: `https://oicar-api-ms1749710600.azurewebsites.net/health`
-- **API Documentation**: `https://oicar-api-ms1749710600.azurewebsites.net/swagger`
-- **Mobile Web App**: Deployed via Vercel CDN
+
+- **API Backend**: `https://oicar-api-ms1749710600.azurewebsites.net`  
+  
+  We also had swagger that was enabled for testing the endpoints before production, but we disabled it in production.
+- **API Health Check**: `https://oicar-api-ms1749710600.azurewebsites.net/health`  
+  
+  We can test this to see if the API is running on my Azure.
+- **Mobile Web App**: `https://oicar-mobile-app-v3.vercel.app`    
+Since this is a React native app, it can also be run on the web. So I have decided to upload it to Vercel also.
+
+- **Web Frontend**   
+`https://snjofkalo-ui.vercel.app/items`  
+This is our front end for the web.
 
 ### **Database:**
 - **Azure SQL Server**: `oicar-sql-server-ms1749709920.database.windows.net`
 - **Database**: `SnjofkaloDB`
-- **Management**: Connect via DBeaver (see connection guide)
+- **Management**: Connect via DBeaver I recommend using DBeaver because our team is cross platform as one developer with me is developing on the Macbook and other are on the Windows machine.
 
-## 🧪 **Testing Infrastructure** ⭐ **18 AUTOMATED TESTS**
+##  **Testing Infrastructure**  
 
 ### **Testing Strategy:**
-- **API Tests (10)**: XUnit + Moq + FluentAssertions
-- **Mobile Tests (8)**: Jest + jest-expo + React Native Testing Library  
-- **Integration**: Tests run before every deployment
-- **Protection**: Deployments blocked if tests fail
+We have 10 API tests that are using XUnit + Moq + FluentAssertions
+
+We also have 8 mobile tests that are using Jest + Jest Expo + React Native Testing Library.
+
+The idea is that the test will run when deploying to production. So, integration tests should run before every deployment and that will protect and block deployment if those tests fail.
+
 
 ### **Test Categories:**
-```
-API Tests (10):
-├─ Unit Tests (8)
-│  ├─ AuthController Tests (3) 
-│  └─ Utility Tests (5)
-└─ Integration Tests (2)
 
-Mobile Tests (8):
-├─ Unit Tests (6)
-│  ├─ Component Tests (2)
-│  └─ Utility Tests (4)  
-└─ Integration Tests (2)
+10 API tests:   
+- 8 Unit
+- - 3 for the AuthCOntroller
+- - 5 utility
+- 2 Integration 
 
-Total: 18 tests, 100% passing ✅
-```
 
-## 🚀 **Quick Start**
+##  **Quick Start**
+This part should help you start the application on your machine.
 
 ### **Prerequisites**
 - .NET 9.0 SDK
@@ -58,13 +70,19 @@ Total: 18 tests, 100% passing ✅
 
 ### **1. Clone and Setup**
 ```bash
-git clone [repository-url]
+git clone https://github.com/sokol-matija/OICAR-v2.git
 cd OICAR
 ```
 
 ### **2. Run API Locally**
+First, we need to run the API locally, cause we will see swagger there. I have made it so swagger opens automatically.
+Okay, we need to go into the Shn and because it's a .NET project, we need to first run .NET restore and .NET run.
+.NET restore will download all the dependencies. In.NET run will run the API in in local development.
 ```bash
-cd "SnjofkaloAPI - Copy/SnjofkaloAPI"
+cd OICAR-v2
+cd cd SnjofkaloAPI\ -\ Copy
+cd SnjofkaloAPI - Copy/SnjofkaloAPI
+cd SnjofkaloAPI/
 dotnet restore
 dotnet run
 # API available at: http://localhost:5042
@@ -72,6 +90,9 @@ dotnet run
 ```
 
 ### **3. Run Mobile App Locally** 
+Then after we have run the API we'll also run the mobile app.
+we go back to the root of the project.
+a Then we download all the dependencies and try to start the application
 ```bash
 cd OICAR-MobileApp
 npm install
@@ -79,16 +100,29 @@ npm start
 # Expo development server starts
 # Scan QR code with Expo Go app
 ```
-
-### **4. Run Web Portal Locally**
-```bash
-cd OICAR-WebApp
-dotnet restore  
-dotnet run
-# Web portal available at: http://localhost:5082
+We can also use the command that I preferre 
+```
+npx expo start
+```
+We can also use the flag --android to opening directly in our Android emulator 
+Also, if we run into any trouble, we can use the following command.
+```
+npx expo start --clear 
 ```
 
-## 🧪 **Manual Testing Commands**
+### **4. Run Web Frontend **
+Then, to test we can also run the web frontend.
+We go back to the root of the folder.
+In this Angular project we need to use npm install and npm start to download and start the dependency and application.
+```bash
+cd snjofkalo-ui
+npm install
+nmp start 
+# Web available at: http://localhost:4200/
+```
+
+##  **Manual Testing Commands**
+For the testing of the application, we can run the test manually. Once we get into the API test directory.
 
 ### **API Tests:**
 ```bash
