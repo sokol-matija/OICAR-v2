@@ -1,105 +1,105 @@
-name: Build and Release APK
+# name: Build and Release APK
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
   
-  # Allow manual trigger
-  workflow_dispatch:
+#   # Allow manual trigger
+#   workflow_dispatch:
 
-jobs:
-  build:
-    name: Build APK
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     name: Build APK
+#     runs-on: ubuntu-latest
     
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: OICAR-MobileApp/package-lock.json
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '18'
+#           cache: 'npm'
+#           cache-dependency-path: OICAR-MobileApp/package-lock.json
 
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+#       - name: Setup Expo and EAS
+#         uses: expo/expo-github-action@v8
+#         with:
+#           expo-version: latest
+#           eas-version: latest
+#           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install dependencies
-        run: |
-          cd OICAR-MobileApp
-          npm ci
+#       - name: Install dependencies
+#         run: |
+#           cd OICAR-MobileApp
+#           npm ci
 
-      - name: Create app.json if needed
-        run: |
-          cd OICAR-MobileApp
-          if [ ! -f app.json ]; then
-            echo "app.json not found!"
-            exit 1
-          fi
+#       - name: Create app.json if needed
+#         run: |
+#           cd OICAR-MobileApp
+#           if [ ! -f app.json ]; then
+#             echo "app.json not found!"
+#             exit 1
+#           fi
 
-      - name: Build APK
-        run: |
-          cd OICAR-MobileApp
-          eas build --platform android --profile preview --non-interactive --wait
-        env:
-          EAS_NO_VCS: 1
+#       - name: Build APK
+#         run: |
+#           cd OICAR-MobileApp
+#           eas build --platform android --profile preview --non-interactive --wait
+#         env:
+#           EAS_NO_VCS: 1
 
-      - name: Download APK
-        run: |
-          cd OICAR-MobileApp
-          # Get the latest build URL and download it
-          BUILD_URL=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].artifacts.buildUrl')
-          if [ "$BUILD_URL" != "null" ] && [ -n "$BUILD_URL" ]; then
-            curl -L -o oicar-app.apk "$BUILD_URL"
-            echo "APK downloaded successfully"
-            ls -la *.apk
-          else
-            echo "No build URL found"
-            exit 1
-          fi
+#       - name: Download APK
+#         run: |
+#           cd OICAR-MobileApp
+#           # Get the latest build URL and download it
+#           BUILD_URL=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].artifacts.buildUrl')
+#           if [ "$BUILD_URL" != "null" ] && [ -n "$BUILD_URL" ]; then
+#             curl -L -o oicar-app.apk "$BUILD_URL"
+#             echo "APK downloaded successfully"
+#             ls -la *.apk
+#           else
+#             echo "No build URL found"
+#             exit 1
+#           fi
 
-      - name: Create Release
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: "v1.0.${{ github.run_number }}"
-          name: "OICAR Mobile App v1.0.${{ github.run_number }}"
-          body: |
-            ## 📱 OICAR Mobile App Release
+#       - name: Create Release
+#         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           tag_name: "v1.0.${{ github.run_number }}"
+#           name: "OICAR Mobile App v1.0.${{ github.run_number }}"
+#           body: |
+#             ## 📱 OICAR Mobile App Release
             
-            ### What's New
-            - Latest version of OICAR mobile application
-            - Built from commit: ${{ github.sha }}
+#             ### What's New
+#             - Latest version of OICAR mobile application
+#             - Built from commit: ${{ github.sha }}
             
-            ### 📥 Installation Instructions
-            1. Download the APK file below
-            2. On your Android device, go to Settings → Security → Enable "Install from unknown sources"
-            3. Open the downloaded APK file and install
+#             ### 📥 Installation Instructions
+#             1. Download the APK file below
+#             2. On your Android device, go to Settings → Security → Enable "Install from unknown sources"
+#             3. Open the downloaded APK file and install
             
-            ### 🔗 Quick Links
-            - [Repository](https://github.com/${{ github.repository }})
-            - [Issues](https://github.com/${{ github.repository }}/issues)
+#             ### 🔗 Quick Links
+#             - [Repository](https://github.com/${{ github.repository }})
+#             - [Issues](https://github.com/${{ github.repository }}/issues)
             
-            ---
-            Built with ❤️ using Expo and GitHub Actions
-          files: |
-            OICAR-MobileApp/*.apk
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#             ---
+#             Built with ❤️ using Expo and GitHub Actions
+#           files: |
+#             OICAR-MobileApp/*.apk
+#           draft: false
+#           prerelease: false
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload APK as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: oicar-apk-${{ github.run_number }}
-          path: OICAR-MobileApp/*.apk
-          retention-days: 30 
+#       - name: Upload APK as Artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: oicar-apk-${{ github.run_number }}
+#           path: OICAR-MobileApp/*.apk
+#           retention-days: 30 
