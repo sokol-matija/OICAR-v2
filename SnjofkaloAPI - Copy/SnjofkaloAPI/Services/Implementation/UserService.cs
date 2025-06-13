@@ -494,25 +494,22 @@ namespace SnjofkaloAPI.Services.Implementation
                     return ApiResponse<object>.ErrorResult("User not found");
                 }
 
-                var stats = new
+                var sellerStats = new
                 {
                     TotalItemsListed = user.SellerItems.Count,
-                    ActiveItems = user.SellerItems.Count(i => i.ItemStatus == "Active" && i.IsActive),
-                    PendingItems = user.SellerItems.Count(i => i.ItemStatus == "Pending"),
-                    SoldItems = user.SellerItems.Count(i => i.ItemStatus == "Sold"),
-                    TotalRevenue = user.SellerItems
-                        .SelectMany(i => i.OrderItems)
-                        .Sum(oi => oi.Quantity * oi.PriceAtOrder),
-                    TotalCommission = user.SellerItems
-                        .SelectMany(i => i.OrderItems)
-                        .Sum(oi => oi.Quantity * oi.PriceAtOrder * (oi.Item.CommissionRate ?? 0)),
-                    IsSeller = user.SellerItems.Any(),
-                    NetEarnings = user.SellerItems
-                        .SelectMany(i => i.OrderItems)
-                        .Sum(oi => oi.Quantity * oi.PriceAtOrder * (1 - (oi.Item.CommissionRate ?? 0)))
+                    ActiveItems = user.SellerItems.Count(i => i.IsActive && i.ItemStatus == "Active"),
+                    PendingApproval = user.SellerItems.Count(i => !i.IsApproved && i.ItemStatus == "Pending"),
+                    TotalSales = user.SellerItems.SelectMany(i => i.OrderItems).Count(),
+                    TotalRevenue = user.SellerItems.SelectMany(i => i.OrderItems).Sum(oi => oi.PriceAtOrder * oi.Quantity),
+                    AverageItemPrice = user.SellerItems.Any() ? user.SellerItems.Average(i => i.Price) : 0,
+                    TopSellingItems = user.SellerItems
+                        .OrderByDescending(i => i.OrderItems.Sum(oi => oi.Quantity))
+                        .Take(5)
+                        .Select(i => new { i.Title, SalesCount = i.OrderItems.Sum(oi => oi.Quantity) })
+                        .ToList()
                 };
 
-                return ApiResponse<object>.SuccessResult(stats);
+                return ApiResponse<object>.SuccessResult(sellerStats);
             }
             catch (Exception ex)
             {
@@ -522,7 +519,64 @@ namespace SnjofkaloAPI.Services.Implementation
         }
 
         /// <summary>
-        /// Get user profile with enhanced marketplace and GDPR information
+        /// Get user profile with anonymization data for both mobile and web frontends
+        /// </summary>
+        public async Task<ApiResponse<object>> GetUserProfileWithAnonymizationAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return ApiResponse<object>.ErrorResult("User not found");
+                }
+
+                // Decrypt user data
+                _encryptionService.DecryptEntity(user);
+
+                var profileData = new
+                {
+                    IDUser = user.IDUser,
+                    Username = user.Username,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    IsAdmin = user.IsAdmin,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt,
+                    LastLoginAt = user.LastLoginAt,
+                    FailedLoginAttempts = user.FailedLoginAttempts,
+                    // Web frontend fields
+                    RequestedAnonymization = user.RequestedAnonymization,
+                    AnonymizationRequestDate = user.AnonymizationRequestDate,
+                    AnonymizationReason = user.AnonymizationReason,
+                    AnonymizationNotes = user.AnonymizationNotes,
+                    // Mobile app specific fields
+                    HasAnonymizationRequest = user.RequestedAnonymization,
+                    AnonymizationRequest = user.RequestedAnonymization ? new
+                    {
+                        IDRequest = 0, // No separate table, use 0
+                        UserID = user.IDUser,
+                        Reason = user.AnonymizationReason,
+                        RequestDate = user.AnonymizationRequestDate,
+                        Status = "pending", // Since we only track requested flag
+                        ProcessedDate = (DateTime?)null,
+                        Notes = user.AnonymizationNotes
+                    } : null
+                };
+
+                return ApiResponse<object>.SuccessResult(profileData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user profile with anonymization for user {UserId}", userId);
+                return ApiResponse<object>.ErrorResult("An error occurred while retrieving user profile");
+            }
+        }
+
+        /// <summary>
+        /// Get enhanced user profile with statistics and marketplace data
         /// </summary>
         public async Task<ApiResponse<UserResponse>> GetUserProfileWithStatsAsync(int userId)
         {

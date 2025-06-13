@@ -41,7 +41,7 @@ namespace SnjofkaloAPI.Controllers
                 return Unauthorized("Invalid token");
             }
 
-            var result = await _userService.GetUserByIdAsync(userId);
+            var result = await _userService.GetUserProfileWithAnonymizationAsync(userId);
 
             if (!result.Success)
             {

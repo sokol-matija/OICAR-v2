@@ -24,5 +24,8 @@ namespace SnjofkaloAPI.Services.Interfaces
 
         // NEW: Marketplace/seller methods
         Task<ApiResponse<object>> GetSellerStatisticsAsync(int userId);
+        
+        // NEW: Profile with anonymization data
+        Task<ApiResponse<object>> GetUserProfileWithAnonymizationAsync(int userId);
     }
 }
