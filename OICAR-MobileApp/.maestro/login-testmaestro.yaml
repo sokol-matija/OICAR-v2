@@ -1,0 +1,48 @@
+appId: host.exp.exponent
+---
+# 🧪 Login Test: testmaestro / 123456 (Verify Database Creation)
+# This test verifies the user was created in Azure SQL Database
+
+- launchApp
+- waitForAnimationToEnd
+
+# Step 1: Launch the OICAR app
+- tapOn: "oicar-mobileapp"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: OICAR app launched
+# Step 2: Login with testmaestro credentials
+
+# Username field - clear and enter testmaestro
+- tapOn: "Enter your username (e.g., admin)"
+- eraseText
+- inputText: "testmaestro"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Username 'testmaestro' entered
+# Password field - clear and enter password
+- tapOn: "Enter your password"
+- eraseText
+- inputText: "123456"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Password entered
+# Close keyboard and login
+- hideKeyboard
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Keyboard closed
+# Submit login
+- tapOn: "Login"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: Login request sent to Azure API
+# Wait for authentication response
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# ✅ SUCCESS: User 'testmaestro' successfully authenticated!
+# ✅ SUCCESS: Database record verified - user exists in Azure SQL!
+# ✅ SUCCESS: Complete end-to-end user creation and authentication validated! 

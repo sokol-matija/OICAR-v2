@@ -1,0 +1,67 @@
+# Test just the registration flow to debug the Register button
+appId: host.exp.exponent
+---
+- launchApp
+- waitForAnimationToEnd
+
+
+# === APP LAUNCH ===
+# Launch the OICAR app
+- tapOn: "oicar-mobileapp"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# === REGISTRATION FLOW ===
+# Navigate to Register
+- tapOn:
+    id: "navigate-to-register-button"
+- waitForAnimationToEnd
+
+# Fill registration form using testID
+- tapOn:
+    id: "register-username-input"
+- inputRandomEmail
+#- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-email-input"
+- inputRandomEmail
+#- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-password-input"
+- inputText: "123456"
+#- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-firstname-input"
+- inputText: "Test"
+#- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-lastname-input"
+- inputText: "Maestro"
+#- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-phone-input"
+- inputText: "+1234567890"
+#- waitForAnimationToEnd
+
+- tapOn: "Register"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-submit-button"
+- waitForAnimationToEnd
+
+- scroll
+- waitForAnimationToEnd
+
+- tapOn:
+    point: 74%,96%
+- waitForAnimationToEnd
+
+- tapOn:
+    text: "OK"
+- waitForAnimationToEnd

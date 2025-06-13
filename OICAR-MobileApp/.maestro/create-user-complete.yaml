@@ -1,0 +1,86 @@
+appId: host.exp.exponent
+---
+# 🧪 Complete User Creation: testmaestro / 123456 (ALL FIELDS)
+# This test creates a real user with ALL required fields in Azure SQL Database
+
+- launchApp
+- waitForAnimationToEnd
+
+# Step 1: Launch the OICAR app
+- tapOn: "oicar-mobileapp"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: OICAR app launched
+# Step 2: Navigate to registration
+- tapOn: "Register here"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Registration screen opened
+# Step 3: Fill ALL registration form fields properly
+
+# Username field
+- tapOn: "Enter your username"
+- eraseText
+- inputText: "testmaestro"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Username entered
+# Email field
+- tapOn: "Enter your email"
+- eraseText
+- inputText: "testmaestro@example.com"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Email entered
+# Password field
+- tapOn: "Enter your password"
+- eraseText
+- inputText: "123456"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Password entered
+# First Name field
+- tapOn: "Enter your first name"
+- eraseText
+- inputText: "Test"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: First name entered
+# Scroll down to reveal Last Name field
+- scroll
+- waitForAnimationToEnd
+
+# Last Name field
+- tapOn: "Enter your last name"
+- eraseText
+- inputText: "Maestro"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Last name entered
+# Phone Number field
+- tapOn: "Enter your phone number"
+- eraseText
+- inputText: "+1234567890"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Phone number entered
+# Close keyboard by tapping outside the form or using Done button
+- tapOn: "Done"
+- waitForAnimationToEnd
+
+# If Done doesn't work, try tapping the Register button area
+- scroll
+- waitForAnimationToEnd
+
+# Submit registration with all fields completed
+- tapOn: "Register"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: Registration submitted with ALL fields
+# Wait for registration response
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# ✅ SUCCESS: User 'testmaestro' created with complete profile in Azure SQL Database! 

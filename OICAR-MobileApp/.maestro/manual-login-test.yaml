@@ -1,0 +1,25 @@
+appId: host.exp.exponent
+---
+# 🧪 Manual Login Test - Enter actual credentials
+
+- launchApp
+- waitForAnimationToEnd
+
+# Try to find and use the username field
+- tapOn: "Username"
+- inputText: "admin"
+
+# Try to find and use the password field  
+- tapOn: "Password"
+- inputText: "admin"
+
+# Try to login
+- tapOn: "Login"
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# ✅ SUCCESS: Login attempt completed
+# Verify if we're logged in
+- assertVisible: "Dashboard"
+
+# ✅ SUCCESS: Successfully logged in with manual credentials 

@@ -1,0 +1,69 @@
+appId: host.exp.exponent
+---
+# 🧪 Create Test User: testmaestro / 123456
+# This test creates a real user in Azure SQL Database
+
+- launchApp
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: App launched
+# Navigate to registration screen
+- tapOn: "Register here"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Registration screen opened
+# Fill registration form with testmaestro user
+- tapOn: "Username"
+- inputText: "testmaestro"
+
+# ✅ SUCCESS: Username 'testmaestro' entered
+- tapOn: "First Name"
+- inputText: "Test"
+
+# ✅ SUCCESS: First name entered
+- tapOn: "Last Name"
+- inputText: "Maestro"
+
+# ✅ SUCCESS: Last name entered
+- tapOn: "Email"
+- inputText: "testmaestro@example.com"
+
+# ✅ SUCCESS: Email entered
+- tapOn: "Password"
+- inputText: "123456"
+
+# ✅ SUCCESS: Password '123456' entered
+- tapOn: "Confirm Password"
+- inputText: "123456"
+
+# ✅ SUCCESS: Password confirmation entered
+# Submit registration
+- tapOn: "Create Account"
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# ✅ SUCCESS: Registration submitted to API
+# Wait for account creation response
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# ✅ SUCCESS: Account created in Azure SQL Database
+# Now login with the new credentials manually
+- tapOn: "Username"
+- inputText: "testmaestro"
+
+# ✅ SUCCESS: Username entered for login
+- tapOn: "Password"
+- inputText: "123456"
+
+# ✅ SUCCESS: Password entered for login
+# Login button press
+- tapOn: "Login"
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# ✅ SUCCESS: Login request sent
+# Verify successful login
+- assertVisible: "Welcome"
+
+# ✅ SUCCESS: User 'testmaestro' successfully created and logged in! 

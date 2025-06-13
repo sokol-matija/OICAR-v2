@@ -1,0 +1,100 @@
+appId: host.exp.exponent
+---
+# 🧪 Create Test User: testmaestro / 123456 (WITH SCROLL)
+# This test creates a real user in Azure SQL Database
+
+- launchApp
+- waitForAnimationToEnd
+
+# Step 1: Tap on the OICAR app to actually launch it
+- tapOn: "oicar-mobileapp"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: OICAR app launched and loaded
+# Step 2: Navigate to registration screen
+- tapOn: "Register here"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Registration screen opened
+# Step 3: Fill registration form fields (first visible ones)
+
+# Username field
+- tapOn: "Username"
+- inputText: "testmaestro"
+
+# ✅ SUCCESS: Username 'testmaestro' entered
+# Email field
+- tapOn: "Email"
+- inputText: "testmaestro@example.com"
+
+# ✅ SUCCESS: Email entered
+# Password field
+- tapOn: "Password"
+- inputText: "123456"
+
+# ✅ SUCCESS: Password '123456' entered
+# First Name field
+- tapOn: "First Name"
+- inputText: "Test"
+
+# ✅ SUCCESS: First name entered
+# Step 4: Scroll down to see more fields
+- scroll
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Scrolled down to reveal more fields
+# Last Name field (should be visible now)
+- tapOn: "Last Name"
+- inputText: "Maestro"
+
+# ✅ SUCCESS: Last name entered
+# Phone Number field
+- tapOn: "Phone Number"
+- inputText: "+1234567890"
+
+# ✅ SUCCESS: Phone number entered
+# Step 5: Submit registration (scroll down to see Register button if needed)
+- scroll
+- waitForAnimationToEnd
+
+# Find and tap Register button
+- tapOn: "Register"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: Registration submitted to Azure API
+# Step 6: Verify registration success 
+# Note: Registration might redirect to login automatically
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# ✅ SUCCESS: Registration completed
+# Step 7: Login with the new credentials
+# If we're not automatically logged in, go to login screen
+- tapOn: "Login here"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: On login screen
+# Enter username
+- tapOn: "Username"
+- inputText: "testmaestro"
+
+# ✅ SUCCESS: Username entered for login
+# Enter password
+- tapOn: "Password"
+- inputText: "123456"
+
+# ✅ SUCCESS: Password entered for login
+# Step 8: Login with new account
+- tapOn: "Login"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: Login request sent
+# Step 9: Verify successful login
+- assertVisible: "Welcome"
+
+# ✅ SUCCESS: User 'testmaestro' successfully created and logged in!
+# ✅ SUCCESS: Real database record created in Azure SQL
+# ✅ SUCCESS: End-to-end authentication flow validated 

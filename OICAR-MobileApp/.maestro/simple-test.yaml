@@ -1,0 +1,19 @@
+appId: host.exp.exponent
+---
+# 🧪 Simple Test: Verify App is Working
+
+- launchApp
+
+# Verify app is loaded
+- assertVisible: "Snjofkalo"
+
+# Verify login screen elements
+- assertVisible: "Login"
+- assertVisible: "Username"
+- assertVisible: "Password"
+
+# Verify register button exists
+- assertVisible: "Register here"
+
+# Try to tap register button
+- tapOn: "Register here" 

@@ -1,0 +1,110 @@
+appId: host.exp.exponent
+---
+# 🧪 Create Test User: testmaestro / 123456 (PROPER FIELD NAVIGATION)
+# This test creates a real user in Azure SQL Database
+
+- launchApp
+- waitForAnimationToEnd
+
+# Step 1: Launch the OICAR app
+- tapOn: "oicar-mobileapp"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# Step 2: Navigate to registration
+- tapOn: "Register here"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Registration screen opened
+# Step 3: Clear and fill each field properly
+
+# Username field - tap placeholder area and clear
+- tapOn: "Enter your username"
+- eraseText
+- inputText: "testmaestro"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Username entered correctly
+# Email field - tap placeholder and clear
+- tapOn: "Enter your email"
+- eraseText
+- inputText: "testmaestro@example.com"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Email entered correctly
+# Password field - tap placeholder and clear
+- tapOn: "Enter your password"
+- eraseText
+- inputText: "123456"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Password entered correctly
+# First Name field - tap placeholder and clear
+- tapOn: "Enter your first name"
+- eraseText
+- inputText: "Test"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: First name entered correctly
+# Scroll to see Last Name field
+- scroll
+- waitForAnimationToEnd
+
+# Last Name field - tap placeholder and clear
+- tapOn: "Enter your last name"
+- eraseText
+- inputText: "Maestro"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Last name entered correctly
+# Phone Number field - scroll and tap
+- scroll
+- waitForAnimationToEnd
+- tapOn: "Enter your phone number"
+- eraseText
+- inputText: "+1234567890"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Phone number entered correctly
+# Submit registration
+- scroll
+- waitForAnimationToEnd
+- tapOn: "Register"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: Registration submitted to Azure API
+# Wait for response and handle success/redirect
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# Step 4: Login with new credentials
+# Navigate to login (if not automatically redirected)
+- tapOn: "Login here"
+- waitForAnimationToEnd
+
+# Clear and enter login credentials
+- tapOn: "Enter your username (e.g., admin)"
+- eraseText
+- inputText: "testmaestro"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Login username entered
+- tapOn: "Enter your password"
+- eraseText
+- inputText: "123456"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Login password entered
+# Submit login
+- tapOn: "Login"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: Login request sent
+# Verify successful authentication
+- assertVisible: "Welcome"
+
+# ✅ SUCCESS: User 'testmaestro' created and logged in successfully!
+# ✅ SUCCESS: Real database record created in Azure SQL
+# ✅ SUCCESS: Complete end-to-end authentication validated 

@@ -1,0 +1,13 @@
+appId: host.exp.exponent
+---
+# 🧪 Simple API Test - Verify Basic Functionality
+
+- launchApp
+- waitForAnimationToEnd
+
+# Just try to interact with what we can see
+- tapOn: "Login"
+- waitForAnimationToEnd
+
+# Log what we actually see for debugging
+# This will help us understand the current UI state 

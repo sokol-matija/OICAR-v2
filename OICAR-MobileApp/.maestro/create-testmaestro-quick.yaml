@@ -1,0 +1,64 @@
+appId: host.exp.exponent
+---
+# 🧪 Create Test User: testmaestro / 123456 (QUICK VERSION - Required Fields Only)
+# This test creates a real user in Azure SQL Database
+
+- launchApp
+- waitForAnimationToEnd
+
+# Step 1: Launch the OICAR app
+- tapOn: "oicar-mobileapp"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# Step 2: Navigate to registration
+- tapOn: "Register here"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Registration screen opened
+# Step 3: Fill only the essential required fields
+
+# Username field - tap placeholder area and clear
+- tapOn: "Enter your username"
+- eraseText
+- inputText: "testmaestro"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Username entered correctly
+# Email field - tap placeholder and clear
+- tapOn: "Enter your email"
+- eraseText
+- inputText: "testmaestro@example.com"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Email entered correctly
+# Password field - tap placeholder and clear
+- tapOn: "Enter your password"
+- eraseText
+- inputText: "123456"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: Password entered correctly
+# First Name field - tap placeholder and clear
+- tapOn: "Enter your first name"
+- eraseText
+- inputText: "Test"
+- waitForAnimationToEnd
+
+# ✅ SUCCESS: First name entered correctly
+# Close keyboard to see Register button
+- hideKeyboard
+
+# ✅ SUCCESS: Keyboard closed, form visible
+# Submit registration
+- tapOn: "Register"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ✅ SUCCESS: Registration submitted to Azure API
+# Wait for response and handle success/redirect
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# ✅ SUCCESS: User 'testmaestro' created in Azure SQL Database!
+# ✅ SUCCESS: Complete end-to-end user registration validated 

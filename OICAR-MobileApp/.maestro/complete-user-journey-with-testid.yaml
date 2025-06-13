@@ -1,0 +1,196 @@
+# OICAR-MobileApp/.maestro/complete-user-journey-with-testid.yaml
+# Complete E2E test using testID selectors for reliable element targeting
+appId: host.exp.exponent
+---
+- launchApp
+- waitForAnimationToEnd
+
+# === APP LAUNCH ===
+# Launch the OICAR app
+- tapOn: "oicar-mobileapp"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# === REGISTRATION FLOW ===
+# Wait for app to fully load
+
+# Navigate to Register
+- tapOn:
+    id: "navigate-to-register-button"
+- waitForAnimationToEnd
+
+# Fill registration form using testID
+- tapOn:
+    id: "register-username-input"
+- inputText: "testmaestro"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-email-input" 
+- inputText: "testmaestro@example.com"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-password-input"
+- inputText: "123456"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-firstname-input"
+- inputText: "Test"
+- waitForAnimationToEnd
+
+# Scroll to reveal bottom fields
+- scroll
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-lastname-input"
+- inputText: "Maestro"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "register-phone-input"
+- inputText: "+1234567890"
+- waitForAnimationToEnd
+
+# Submit registration
+- tapOn:
+    id: "register-submit-button"
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# Handle registration success notification
+- tapOn: "OK"
+- waitForAnimationToEnd
+
+# === LOGIN FLOW ===
+# Now we should be back on login screen
+- tapOn:
+    id: "login-username-input"
+- inputText: "testmaestro"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "login-password-input"
+- inputText: "123456"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "login-submit-button"
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# Wait for login success
+- tapOn: "OK"
+- waitForAnimationToEnd
+
+# === NAVIGATION TESTING ===
+# Test Products tab
+- tapOn:
+    id: "nav-tab-products"
+- waitForAnimationToEnd
+
+# Search for products
+- tapOn:
+    id: "products-search-input"
+- inputText: "test"
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "products-search-button"
+- waitForAnimationToEnd
+
+# Test category filter
+- tapOn:
+    id: "category-filter-dropdown"
+- waitForAnimationToEnd
+
+# Select "All Products" category
+- tapOn:
+    id: "category-all-products"
+- waitForAnimationToEnd
+
+# Clear search to see all products
+- tapOn:
+    id: "products-search-input"
+- eraseText
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "products-search-button"
+- waitForAnimationToEnd
+
+# Add first available item to cart (assuming there's at least one product)
+- tapOn:
+    text: "Add to Cart"
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Wait for add to cart success (if there's a notification)
+- tapOn: "OK"
+- waitForAnimationToEnd
+
+# === CART TESTING ===
+- tapOn:
+    id: "nav-tab-cart"
+- waitForAnimationToEnd
+
+# Verify cart has items and test checkout
+- tapOn:
+    id: "checkout-button"
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# Handle checkout confirmation
+- tapOn: "Continue Shopping"
+- waitForAnimationToEnd
+
+# === ORDERS TESTING ===
+- tapOn:
+    id: "nav-tab-orders"
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Click on first order if exists (wait a bit for orders to load)
+- tapOn:
+    text: "Order #"
+- waitForAnimationToEnd
+
+# Go back from order details (if we navigate away)
+- tapOn: "Back"
+- waitForAnimationToEnd
+
+# === HOME TESTING ===
+- tapOn:
+    id: "nav-tab-home"
+- waitForAnimationToEnd
+
+# Verify we're on home screen
+
+# === PROFILE TESTING ===
+- tapOn:
+    id: "nav-tab-profile"
+- waitForAnimationToEnd
+
+# Test edit profile
+- tapOn:
+    id: "edit-profile-button"
+- waitForAnimationToEnd
+
+# Cancel edit (assuming there's a cancel button)
+- tapOn: "Cancel"
+- waitForAnimationToEnd
+
+# === LOGOUT FLOW ===
+- tapOn:
+    id: "logout-button"
+- waitForAnimationToEnd
+
+# Confirm logout if prompted
+- tapOn: "Logout"
+- waitForAnimationToEnd
+
+# === TEST COMPLETION ===
+# Final verification that we completed the full journey
+# We should be back on the login screen 
