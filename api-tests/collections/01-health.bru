@@ -1,0 +1,41 @@
+meta {
+  name: Health Check
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{healthUrl}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+docs {
+  # Health Check Endpoint
+  
+  This endpoint verifies that the OICAR API is running and healthy.
+  
+  **Expected Responses:**
+  - 200: API is healthy and running
+  - 503: API is running but unhealthy (database issues, etc.)
+  
+  **Test Environments:**
+  - Local: http://localhost:5042/health  
+  - Azure: https://oicar-api-ms1749710600.azurewebsites.net/health
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("API Health Check", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response Time", function() {
+    expect(res.getResponseTime()).to.be.below(2000);
+  });
+} 

@@ -1,0 +1,62 @@
+meta {
+  name: Get Current User
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{apiUrl}}/auth/me
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  # Get Current User Profile
+  
+  Retrieves the current authenticated user's information.
+  
+  **Authentication Required:** JWT Bearer token
+  
+  **Expected Response (200):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "userId": "1",
+      "username": "testuser",
+      "email": "testuser@example.com",
+      "isAdmin": false
+    }
+  }
+  ```
+  
+  **Note:** Must be logged in to use this endpoint!
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.userId: isDefined
+}
+
+tests {
+  test("Profile retrieved successfully", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().success).to.be.true;
+    expect(res.getBody().data.userId).to.be.a('string');
+  });
+  
+  test("User data structure", function() {
+    const userData = res.getBody().data;
+    expect(userData.username).to.be.a('string');
+    expect(userData.email).to.be.a('string');
+    expect(userData.isAdmin).to.be.a('boolean');
+  });
+  
+  test("Authentication working", function() {
+    expect(res.getBody().data.userId).to.not.be.empty;
+  });
+} 

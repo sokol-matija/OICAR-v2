@@ -1,0 +1,94 @@
+meta {
+  name: Authentication
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{apiUrl}}/auth/register
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "testuser_{{$randomInt}}",
+    "firstName": "Test",
+    "lastName": "User",
+    "email": "testuser{{$randomInt}}@example.com",
+    "password": "TestPassword123",
+    "confirmPassword": "TestPassword123",
+    "phoneNumber": "+1234567890"
+  }
+}
+
+docs {
+  # User Registration
+  
+  Registers a new user account in the OICAR platform.
+  
+  **Request Fields:**
+  - username: 1-50 characters, unique
+  - firstName: 1-100 characters
+  - lastName: 1-100 characters  
+  - email: Valid email format, unique
+  - password: 6-100 characters
+  - confirmPassword: Must match password
+  - phoneNumber: Optional, phone format
+  
+  **Expected Response (200):**
+  ```json
+  {
+    "success": true,
+    "message": "Registration successful",
+    "data": {
+      "token": "jwt_token",
+      "refreshToken": "refresh_token",
+      "expiresAt": "2024-01-01T00:00:00Z",
+      "user": {
+        "idUser": 1,
+        "username": "testuser",
+        "firstName": "Test",
+        "lastName": "User",
+        "email": "testuser@example.com",
+        "isAdmin": false
+      }
+    }
+  }
+  ```
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.token: isDefined
+  res.body.data.user.username: isDefined
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    bru.setVar("authToken", res.getBody().data.token);
+    bru.setVar("refreshToken", res.getBody().data.refreshToken);
+    bru.setVar("testUsername", req.getBody().username);
+    bru.setVar("testPassword", req.getBody().password);
+  }
+}
+
+tests {
+  test("Registration successful", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().success).to.be.true;
+    expect(res.getBody().data.token).to.be.a('string');
+    expect(res.getBody().data.user.isAdmin).to.be.false;
+  });
+  
+  test("User data returned correctly", function() {
+    const user = res.getBody().data.user;
+    expect(user.username).to.be.a('string');
+    expect(user.email).to.include('@');
+    expect(user.firstName).to.equal('Test');
+    expect(user.lastName).to.equal('User');
+  });
+} 

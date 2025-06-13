@@ -1,0 +1,104 @@
+meta {
+  name: Get Items
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{apiUrl}}/items?pageNumber=1&pageSize=10
+}
+
+headers {
+  Content-Type: application/json
+}
+
+query {
+  pageNumber: 1
+  pageSize: 10
+  searchTerm: 
+  categoryId: 
+  minPrice: 
+  maxPrice: 
+  sortBy: CreatedAt
+  sortOrder: desc
+}
+
+docs {
+  # Get Items/Products
+  
+  Retrieves a paginated list of items from the OICAR marketplace.
+  
+  **Query Parameters (Optional):**
+  - pageNumber: Page number (default: 1)
+  - pageSize: Items per page (default: 10, max: 100)
+  - searchTerm: Search in item title/description
+  - categoryId: Filter by category ID
+  - minPrice: Minimum price filter
+  - maxPrice: Maximum price filter
+  - sortBy: Sort field (Price, CreatedAt, etc.)
+  - sortOrder: asc or desc
+  
+  **Expected Response (200):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [
+        {
+          "idItem": 1,
+          "title": "Sample Product",
+          "description": "Product description",
+          "price": 29.99,
+          "categoryId": 1,
+          "sellerId": 1,
+          "isActive": true,
+          "createdAt": "2024-01-01T00:00:00Z"
+        }
+      ],
+      "totalCount": 25,
+      "currentPage": 1,
+      "pageSize": 10,
+      "totalPages": 3
+    }
+  }
+  ```
+  
+  **Note:** Public endpoint - no authentication required
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.items: isArray
+}
+
+tests {
+  test("Items retrieved successfully", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().success).to.be.true;
+    expect(res.getBody().data.items).to.be.an('array');
+  });
+  
+  test("Pagination data present", function() {
+    const data = res.getBody().data;
+    expect(data.currentPage).to.be.a('number');
+    expect(data.pageSize).to.be.a('number');
+    expect(data.totalCount).to.be.a('number');
+    expect(data.totalPages).to.be.a('number');
+  });
+  
+  test("Items have required fields", function() {
+    const items = res.getBody().data.items;
+    if (items.length > 0) {
+      const firstItem = items[0];
+      expect(firstItem.idItem).to.be.a('number');
+      expect(firstItem.title).to.be.a('string');
+      expect(firstItem.price).to.be.a('number');
+    }
+  });
+  
+  test("Page size respected", function() {
+    const items = res.getBody().data.items;
+    expect(items.length).to.be.at.most(10);
+  });
+} 
