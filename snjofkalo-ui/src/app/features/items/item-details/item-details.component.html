@@ -1,0 +1,116 @@
+<div class="item-details-container" *ngIf="item && !loading && !error">
+  <mat-card class="item-card">
+    <div class="item-header">
+      <h1>{{ item.title }}</h1>
+      <div class="item-meta">
+        <mat-chip-listbox>
+          <mat-chip color="accent" selected>{{ item.categoryName }}</mat-chip>
+          <mat-chip [color]="item.isActive && item.isApproved ? 'primary' : 'warn'" selected>
+            {{ item.isActive && item.isApproved ? 'Available' : 'Unavailable' }}
+          </mat-chip>
+        </mat-chip-listbox>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="item-content">
+      <div class="item-images">
+        <div class="main-image">
+          <img 
+            [src]="item.primaryImage ? 'data:' + item.primaryImage.contentType + ';base64,' + item.primaryImage.imageData.replace('data:image/jpeg;base64,', '') : 'assets/images/placeholder.jpg'" 
+            [alt]="item.title"
+          >
+        </div>
+        <div class="image-gallery" *ngIf="item.images && item.images.length > 0">
+          <div class="thumbnail" 
+               *ngFor="let image of item.images" 
+               (click)="setMainImage(image)"
+               [class.active]="item.primaryImage === image">
+            <img 
+              [src]="'data:' + image.contentType + ';base64,' + image.imageData.replace('data:image/jpeg;base64,', '')" 
+              [alt]="item.title + ' thumbnail'"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="item-info">
+        <div class="price-section">
+          <h2 class="price">{{ item.price | currency:'EUR' }}</h2>
+          <div class="stock" [class.low-stock]="item.stockQuantity <= 5 && item.stockQuantity > 0">
+            Stock: {{ item.stockQuantity }} {{ item.stockQuantity === 0 ? '(Out of Stock)' : '' }}
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="description">
+          <h3>Description</h3>
+          <p>{{ item.description }}</p>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="seller-info" *ngIf="item.sellerName">
+          <h3>Seller Information</h3>
+          <p><mat-icon>storefront</mat-icon> {{ item.sellerName }}</p>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="item-meta-info">
+          <div class="meta-item">
+            <span class="label"><mat-icon>event</mat-icon> Created:</span>
+            <span class="value">{{ item.createdAt | date:'mediumDate' }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="label"><mat-icon>update</mat-icon> Last Updated:</span>
+            <span class="value">{{ item.updatedAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="add-to-cart-section">
+          <div class="quantity-selector">
+            <button mat-icon-button (click)="decreaseQuantity()" [disabled]="quantity <= 1 || item.stockQuantity === 0">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <input type="number" [(ngModel)]="quantity" min="1" [max]="item.stockQuantity" [disabled]="item.stockQuantity === 0">
+            <button mat-icon-button (click)="increaseQuantity()" [disabled]="quantity >= item.stockQuantity || item.stockQuantity === 0">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+          <button mat-raised-button 
+                  color="primary" 
+                  class="add-to-cart-btn" 
+                  (click)="addToCart()" 
+                  [disabled]="!item.isActive || !item.isApproved || item.stockQuantity === 0 || quantity === 0">
+            <mat-icon *ngIf="!loading">add_shopping_cart</mat-icon>
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+            <span *ngIf="!loading">Add to Cart</span>
+          </button>
+        </div>
+
+        <div *ngIf="addToCartMessage" 
+             class="add-to-cart-message" 
+             [class.success]="addToCartSuccess" 
+             [class.error]="!addToCartSuccess">
+          <mat-icon [color]="addToCartSuccess ? 'primary' : 'warn'">{{ addToCartSuccess ? 'check_circle' : 'error' }}</mat-icon>
+          {{ addToCartMessage }}
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>
+
+<div class="loading-spinner" *ngIf="loading">
+  <mat-spinner></mat-spinner>
+  <p>Loading item details...</p>
+</div>
+
+<div class="error-message" *ngIf="error">
+  <mat-icon color="warn">error</mat-icon>
+  <p>{{ error }}</p>
+</div> 

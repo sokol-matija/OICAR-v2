@@ -1,0 +1,48 @@
+<div class="container">
+  <h2>Pending Approvals</h2>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading && items.length === 0" class="no-items">
+    <p>No pending items found.</p>
+  </div>
+
+  <div *ngIf="!loading && items.length > 0" class="items-list">
+    <div *ngFor="let item of items" class="item-card">
+      <div class="item-header">
+        <h3>{{ item.title }}</h3>
+        <span class="item-status" [ngClass]="item.itemStatus.toLowerCase()">
+          {{ item.itemStatus }}
+        </span>
+      </div>
+
+      <div class="item-details">
+        <p><strong>Category:</strong> {{ item.categoryName }}</p>
+        <p><strong>Seller:</strong> {{ item.sellerName }}</p>
+        <p><strong>Price:</strong> ${{ item.price }}</p>
+        <p><strong>Stock:</strong> {{ item.stockQuantity }}</p>
+        <p><strong>Description:</strong> {{ item.description }}</p>
+      </div>
+
+      <div class="item-actions">
+        <button mat-raised-button color="primary" (click)="approveItem(item.idItem)">
+          Approve
+        </button>
+        <button mat-raised-button color="warn" (click)="rejectItem(item.idItem)">
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <mat-paginator
+    *ngIf="totalPages > 1"
+    [length]="totalCount"
+    [pageSize]="pageSize"
+    [pageIndex]="currentPage - 1"
+    (page)="onPageChange($event.pageIndex + 1)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>

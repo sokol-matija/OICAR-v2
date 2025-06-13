@@ -1,0 +1,9 @@
+      <div *ngIf="showConfirmation" 
+           class="order-confirmation-message" 
+           [class.success]="!isErrorConfirmation" 
+           [class.error]="isErrorConfirmation">
+        <h2 *ngIf="!isErrorConfirmation">Order Placed Successfully!</h2>
+        <h2 *ngIf="isErrorConfirmation">Order Placement Failed!</h2>
+        <p>{{ orderPlacedMessage }}</p>
+        <p *ngIf="!isErrorConfirmation">Redirecting you to order confirmation page in a few seconds...</p>
+      </div> 

@@ -1,0 +1,80 @@
+<p-toast></p-toast>
+
+<div class="items-container">
+  <div class="filters">
+    <div class="search">
+      <input type="text" 
+             [(ngModel)]="searchQuery" 
+             (keyup.enter)="onSearch()" 
+             placeholder="Search items...">
+    </div>
+    <div class="action-buttons">
+      <button class="request-item-btn" (click)="openRequestForm()">Request new item</button>
+      <button *ngIf="isAdmin" class="pending-approvals-btn" routerLink="/admin/pending-approvals">
+        Pending Approvals
+      </button>
+    </div>
+    <div class="category-filter">
+      <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+        <option [ngValue]="null">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category.idItemCategory">
+          {{ category.categoryName }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <app-item-request-form 
+    *ngIf="showRequestForm"
+    [showForm]="showRequestForm"
+    (close)="onRequestFormClose()"
+    (submitted)="onRequestSubmitted()">
+  </app-item-request-form>
+
+  <div class="items-grid">
+    <div class="item-card" *ngFor="let item of items" (click)="navigateToItemDetails(item.idItem)">
+      <div class="item-image">
+        <img 
+          [src]="item.primaryImage ? 'data:' + item.primaryImage.contentType + ';base64,' + item.primaryImage.imageData.replace('data:image/jpeg;base64,', '') : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='" 
+          [alt]="item.title" 
+          class="item-image"
+        >
+      </div>
+      <div class="item-details">
+        <h3 class="item-title">{{ item.title }}</h3>
+        <div class="price">{{ item.price | currency }}</div>
+        <p class="description">{{ item.description | truncate }}</p>
+        <div class="category">{{ item.categoryName }}</div>
+        <div class="stock" [class.low-stock]="item.stockQuantity <= 5">
+          Stock: {{ item.stockQuantity }}
+        </div>
+        <div class="status" [class.available]="item.isActive && item.isApproved" [class.unavailable]="!item.isActive || !item.isApproved">
+          {{ item.isActive && item.isApproved ? 'Available' : 'Unavailable' }}
+        </div>
+        <div class="seller" *ngIf="item.sellerName">Seller: {{ item.sellerName }}</div>
+        <div *ngIf="itemAddToCartFeedback[item.idItem]?.message" 
+             class="add-to-cart-feedback" 
+             [class.success]="itemAddToCartFeedback[item.idItem]?.success" 
+             [class.error]="!itemAddToCartFeedback[item.idItem]?.success">
+          {{ itemAddToCartFeedback[item.idItem]?.message }}
+        </div>
+        <button class="add-to-cart" 
+                (click)="$event.stopPropagation(); addToCart(item.idItem)" 
+                [disabled]="!item.isActive || !item.isApproved || item.stockQuantity === 0 || isOwnItem(item)"
+                [ngClass]="{'own-item': isOwnItem(item), 'disabled': isOwnItem(item)}">
+          {{ item.stockQuantity === 0 ? 'Out of Stock' : (isOwnItem(item) ? 'Your Item' : 'Add to Cart') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination">
+    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+      Previous
+    </button>
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">
+      Next
+    </button>
+  </div>
+</div> 

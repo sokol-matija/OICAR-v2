@@ -1,0 +1,76 @@
+<div class="login-container">
+  <div class="welcome-section">
+    <h1>Welcome to Snjofkalo Marketplace</h1>
+    <div class="features">
+      <div class="feature">
+        <mat-icon>shopping_cart</mat-icon>
+        <h3>Shop with Confidence</h3>
+        <p>Browse through thousands of items from trusted sellers</p>
+      </div>
+      <div class="feature">
+        <mat-icon>security</mat-icon>
+        <h3>Secure Shopping</h3>
+        <p>Your transactions are protected with industry-standard security</p>
+      </div>
+      <div class="feature">
+        <mat-icon>local_shipping</mat-icon>
+        <h3>Fast Delivery</h3>
+        <p>Quick and reliable shipping to your doorstep</p>
+      </div>
+      <div class="feature">
+        <mat-icon>handshake</mat-icon>
+        <h3>Community Driven</h3>
+        <p>Connect with a vibrant community of buyers and sellers</p>
+      </div>
+    </div>
+  </div>
+
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Login to Your Account</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="onLogin()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput
+                 type="text"
+                 id="username"
+                 name="username"
+                 [(ngModel)]="username"
+                 required>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput
+                 type="password"
+                 id="password"
+                 name="password"
+                 [(ngModel)]="password"
+                 required>
+          <mat-icon matSuffix>lock</mat-icon>
+        </mat-form-field>
+
+        <div class="error-message" *ngIf="error">
+          <mat-icon>error</mat-icon>
+          {{ error }}
+        </div>
+
+        <button mat-raised-button
+                color="primary"
+                type="submit"
+                class="full-width"
+                [disabled]="loading">
+          <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+          <span *ngIf="!loading">Login</span>
+        </button>
+
+        <div class="auth-links">
+          <p>Don't have an account? <a routerLink="/register">Register now</a></p>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div> 

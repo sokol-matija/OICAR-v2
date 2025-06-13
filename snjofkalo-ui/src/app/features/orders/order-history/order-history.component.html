@@ -1,0 +1,121 @@
+<mat-card class="order-history-container">
+  <mat-card-header>
+    <mat-card-title>Your Order History</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading your orders...</p>
+    </div>
+
+    <!-- Error state -->
+    <mat-card *ngIf="error" class="error-card">
+      <mat-card-content>
+        <mat-icon color="warn">error</mat-icon>
+        <div class="error-content">
+          <h3>Error!</h3>
+          <p>{{ error }}</p>
+          <p>We couldn't load your orders. Please try again later or contact support.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- No orders found -->
+    <div *ngIf="!loading && !error && orders.length === 0" class="no-orders-container">
+      <mat-icon class="no-orders-icon">shopping_cart</mat-icon>
+      <h2>No Orders Found</h2>
+      <p>It looks like you haven't placed any orders yet. Let's change that!</p>
+      <button mat-raised-button color="primary" [routerLink]="['/items']">
+        <mat-icon>shopping_cart</mat-icon>
+        Start Shopping Now
+      </button>
+    </div>
+
+    <!-- Orders table -->
+    <div *ngIf="!loading && !error && orders.length > 0" class="table-container">
+      <table mat-table [dataSource]="orders">
+        <!-- Order Number Column -->
+        <ng-container matColumnDef="orderNumber">
+          <th mat-header-cell *matHeaderCellDef>Order #</th>
+          <td mat-cell *matCellDef="let order">{{order.orderNumber}}</td>
+        </ng-container>
+
+        <!-- Date Column -->
+        <ng-container matColumnDef="orderDate">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let order">{{order.orderDate | date:'mediumDate'}}</td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="statusName">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let order">
+            <span [class]="getStatusClass(order.statusName)">
+              {{order.statusName}}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Type Column -->
+        <ng-container matColumnDef="orderType">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let order">{{order.orderType}}</td>
+        </ng-container>
+
+        <!-- Source Column -->
+        <ng-container matColumnDef="orderSource">
+          <th mat-header-cell *matHeaderCellDef>Source</th>
+          <td mat-cell *matCellDef="let order">{{order.orderSource}}</td>
+        </ng-container>
+
+        <!-- Items Column -->
+        <ng-container matColumnDef="totalItems">
+          <th mat-header-cell *matHeaderCellDef>Items</th>
+          <td mat-cell *matCellDef="let order">{{order.totalItems}}</td>
+        </ng-container>
+
+        <!-- Amount Column -->
+        <ng-container matColumnDef="totalAmount">
+          <th mat-header-cell *matHeaderCellDef>Total Amount</th>
+          <td mat-cell *matCellDef="let order">{{order.totalAmount | currency}}</td>
+        </ng-container>
+
+        <!-- Days Old Column -->
+        <ng-container matColumnDef="daysOld">
+          <th mat-header-cell *matHeaderCellDef>Days Old</th>
+          <td mat-cell *matCellDef="let order">{{order.daysOld}} days</td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let order">
+            <button mat-icon-button [routerLink]="['/orders', order.idOrder]">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <!-- Marketplace Information -->
+      <ng-container *ngFor="let order of orders">
+        <div *ngIf="order.containsUserItems" class="marketplace-info">
+          <mat-card>
+            <mat-card-content>
+              <div class="marketplace-stats">
+                <span>Order #{{order.orderNumber}} - Marketplace Information:</span>
+                <span>Unique Sellers: {{order.uniqueSellerCount}}</span>
+                <span>Estimated Commission: {{order.estimatedCommission | currency}}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-container>
+    </div>
+  </mat-card-content>
+</mat-card> 

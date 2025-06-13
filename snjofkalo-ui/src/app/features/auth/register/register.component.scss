@@ -1,0 +1,166 @@
+.register-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem;
+  gap: 2rem; /* Spacing between the sections */
+}
+
+.welcome-section {
+  flex: 1;
+  max-width: 700px; /* Limit width of welcome section */
+  padding: 2rem;
+  color: #2c3e50;
+  text-align: center; /* Center content within welcome section */
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.feature {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    color: #DAA520;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: #7f8c8d;
+    line-height: 1.6;
+  }
+}
+
+.register-card {
+  width: 400px;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0; /* Prevent card from shrinking */
+
+  mat-card-header {
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+
+  mat-card-title {
+    font-size: 1.5rem;
+    color: #2c3e50;
+  }
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  color: #e74c3c;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  mat-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.success-message {
+  color: #28a745;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  mat-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.auth-links {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #7f8c8d;
+
+  a {
+    color: #DAA520;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+button[type="submit"] {
+  height: 48px;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .register-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .welcome-section {
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .register-card {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    padding: 1rem;
+  }
+
+  .welcome-section h1 {
+    font-size: 2rem;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+} 

@@ -1,0 +1,181 @@
+// Add any custom styles here if needed 
+
+.order-history-container {
+  margin: 2rem;
+  max-width: 1400px;
+  margin: 2rem auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+.error-card {
+  margin: 1rem 0;
+  background-color: #fff3f3;
+  
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    .error-content {
+      h3 {
+        margin: 0;
+        color: #d32f2f;
+      }
+      
+      p {
+        margin: 0.5rem 0;
+        color: #666;
+      }
+    }
+  }
+}
+
+.no-orders-container {
+  text-align: center;
+  padding: 3rem;
+  
+  .no-orders-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #9e9e9e;
+    margin-bottom: 1rem;
+  }
+  
+  h2 {
+    margin: 1rem 0;
+    color: #424242;
+  }
+  
+  p {
+    color: #757575;
+    margin-bottom: 2rem;
+  }
+}
+
+.table-container {
+  margin-top: 1rem;
+  
+  table {
+    width: 100%;
+    
+    .mat-column-actions {
+      width: 120px;
+      text-align: center;
+    }
+    
+    .mat-column-orderNumber {
+      width: 120px;
+    }
+    
+    .mat-column-orderDate {
+      width: 120px;
+    }
+    
+    .mat-column-statusName {
+      width: 120px;
+      
+      span {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        
+        &.status-pending {
+          background-color: #fff3e0;
+          color: #e65100;
+        }
+        
+        &.status-processing {
+          background-color: #e3f2fd;
+          color: #1565c0;
+        }
+        
+        &.status-delivered {
+          background-color: #e8f5e9;
+          color: #2e7d32;
+        }
+        
+        &.status-cancelled {
+          background-color: #ffebee;
+          color: #c62828;
+        }
+      }
+    }
+    
+    .mat-column-orderType,
+    .mat-column-orderSource {
+      width: 100px;
+    }
+    
+    .mat-column-totalItems {
+      width: 80px;
+      text-align: center;
+    }
+    
+    .mat-column-totalAmount {
+      width: 120px;
+      text-align: right;
+    }
+    
+    .mat-column-daysOld {
+      width: 100px;
+      text-align: center;
+    }
+  }
+}
+
+.marketplace-info {
+  margin-top: 1rem;
+  
+  mat-card {
+    background-color: #f5f5f5;
+    
+    .marketplace-stats {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      padding: 1rem;
+      
+      span {
+        font-size: 0.9rem;
+        color: #424242;
+        
+        &:first-child {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .order-history-container {
+    margin: 1rem;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+    
+    table {
+      min-width: 800px;
+    }
+  }
+  
+  .marketplace-info {
+    .marketplace-stats {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+  }
+} 

@@ -1,0 +1,34 @@
+.order-confirmation-message {
+  text-align: center;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &.success {
+    background-color: #e6ffe6; /* Light green background for success */
+    color: #28a745; /* Dark green text */
+    border: 1px solid #28a745;
+  }
+
+  &.error {
+    background-color: #ffe6e6; /* Light red background for error */
+    color: #e74c3c; /* Dark red text */
+    border: 1px solid #e74c3c;
+  }
+
+  h2 {
+    margin-bottom: 1rem;
+    
+    &.success-title {
+      color: #28a745;
+    }
+    &.error-title {
+      color: #e74c3c;
+    }
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+} 

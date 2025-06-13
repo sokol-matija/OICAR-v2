@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\OICAR-WebApp.props" />
-</Project>

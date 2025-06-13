@@ -1,0 +1,57 @@
+<div class="admin-items-container">
+  <h2>Item Approval Requests</h2>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="success" class="success-message">
+    {{ success }}
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Loading...
+  </div>
+
+  <div *ngIf="!loading && items.length === 0" class="no-items">
+    No pending approval requests
+  </div>
+
+  <div *ngIf="!loading && items.length > 0" class="items-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Item ID</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Seller</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Category</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items">
+          <td>{{ item.idItem }}</td>
+          <td>{{ item.title }}</td>
+          <td>{{ item.description | truncate }}</td>
+          <td>{{ item.sellerName }}</td>
+          <td>{{ item.price | currency }}</td>
+          <td>{{ item.stockQuantity }}</td>
+          <td>{{ item.categoryName }}</td>
+          <td>{{ item.createdAt | date:'medium' }}</td>
+          <td class="actions">
+            <button class="approve-btn" (click)="approveItem(item.idItem.toString())" [disabled]="loading">
+              Approve
+            </button>
+            <button class="reject-btn" (click)="rejectItem(item.idItem.toString())" [disabled]="loading">
+              Reject
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,121 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$primary-palette: mat.define-palette(mat.$indigo-palette);
+$accent-palette: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$warn-palette: mat.define-palette(mat.$red-palette);
+
+$theme: mat.define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $accent-palette,
+    warn: $warn-palette,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($theme);
+
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &-primary {
+    background-color: #007bff;
+    color: white;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+
+  &-secondary {
+    background-color: #6c757d;
+    color: white;
+
+    &:hover {
+      background-color: #545b62;
+    }
+  }
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+  }
+}
+
+.add-to-cart-feedback {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  
+  &.success {
+    background-color: #e6ffe6; // Light green
+    color: #28a745; // Darker green
+  }
+  
+  &.error {
+    background-color: #ffe6e6; // Light red
+    color: #dc3545; // Darker red
+  }
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
