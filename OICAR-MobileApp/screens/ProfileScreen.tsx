@@ -11,9 +11,12 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomButton from '../components/CustomButton';
+import AnonymizationDialog from '../components/AnonymizationDialog';
 import { UserService } from '../utils/userService';
+import { ProfileService } from '../utils/profileService';
 import { JWTUtils } from '../utils/jwtUtils';
 import { UserDTO } from '../types/user';
+import { UserProfileWithAnonymization, AnonymizationRequest } from '../types/anonymization';
 
 interface ProfileScreenProps {
   token?: string;
@@ -22,9 +25,11 @@ interface ProfileScreenProps {
 }
 
 export default function ProfileScreen({ token, onEditProfile, onLogout }: ProfileScreenProps) {
-  const [userProfile, setUserProfile] = useState<UserDTO | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfileWithAnonymization | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAnonymizationDialog, setShowAnonymizationDialog] = useState(false);
+  const [anonymizationRequest, setAnonymizationRequest] = useState<AnonymizationRequest | null>(null);
 
   useEffect(() => {
     loadUserProfile();
@@ -43,11 +48,12 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
       
       console.log('🔍 Loading profile with token:', token.substring(0, 20) + '...');
       
-      console.log('🚀 Fetching profile...');
-      const profile = await UserService.getUserProfile();
-      console.log('✅ Profile loaded:', profile);
+      console.log('🚀 Fetching profile with anonymization status...');
+      const profile = await ProfileService.getUserProfileWithAnonymization();
+      console.log('✅ Profile loaded with anonymization status:', profile);
       
       setUserProfile(profile);
+      setAnonymizationRequest(profile.anonymizationRequest || null);
     } catch (error) {
       console.log('💥 Profile loading error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to load profile';
@@ -61,6 +67,35 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
   const handleEditProfile = () => {
     if (userProfile && onEditProfile) {
       onEditProfile(userProfile);
+    }
+  };
+
+  const handleAnonymizationRequest = () => {
+    setShowAnonymizationDialog(true);
+  };
+
+  const handleAnonymizationSuccess = async () => {
+    // Reload profile to get updated status
+    await loadUserProfile();
+  };
+
+  const getAnonymizationStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return '#ffc107'; // Warning yellow
+      case 'approved': return '#17a2b8'; // Info blue  
+      case 'rejected': return '#dc3545'; // Danger red
+      case 'completed': return '#28a745'; // Success green
+      default: return '#6c757d'; // Secondary gray
+    }
+  };
+
+  const getAnonymizationStatusText = (status: string) => {
+    switch (status) {
+      case 'pending': return 'Request Pending';
+      case 'approved': return 'Request Approved';
+      case 'rejected': return 'Request Rejected';
+      case 'completed': return 'Data Anonymized';
+      default: return 'Unknown Status';
     }
   };
 
@@ -152,6 +187,41 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
                     )}
                   </View>
 
+                  {/* Anonymization Status Section */}
+                  {anonymizationRequest && (
+                    <View style={styles.anonymizationSection}>
+                      <Text style={styles.sectionTitle}>Data Anonymization</Text>
+                      <View style={[styles.statusCard, { borderLeftColor: getAnonymizationStatusColor(anonymizationRequest.status) }]}>
+                        <View style={styles.statusHeader}>
+                          <Text style={styles.statusLabel}>Status:</Text>
+                          <Text style={[styles.statusValue, { color: getAnonymizationStatusColor(anonymizationRequest.status) }]}>
+                            {getAnonymizationStatusText(anonymizationRequest.status)}
+                          </Text>
+                        </View>
+                        <View style={styles.statusDetails}>
+                          <Text style={styles.statusDetailLabel}>Requested:</Text>
+                          <Text style={styles.statusDetailValue}>
+                            {new Date(anonymizationRequest.requestDate).toLocaleDateString()}
+                          </Text>
+                        </View>
+                        {anonymizationRequest.processedDate && (
+                          <View style={styles.statusDetails}>
+                            <Text style={styles.statusDetailLabel}>Processed:</Text>
+                            <Text style={styles.statusDetailValue}>
+                              {new Date(anonymizationRequest.processedDate).toLocaleDateString()}
+                            </Text>
+                          </View>
+                        )}
+                        {anonymizationRequest.reason && (
+                          <View style={styles.statusDetails}>
+                            <Text style={styles.statusDetailLabel}>Reason:</Text>
+                            <Text style={styles.statusDetailValue}>{anonymizationRequest.reason}</Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  )}
+
                   <View style={styles.buttonSection}>
                     <CustomButton
                       testID="edit-profile-button"
@@ -160,6 +230,16 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
                       onPress={handleEditProfile}
                       style={styles.editButton}
                     />
+
+                    {!anonymizationRequest && (
+                      <CustomButton
+                        testID="anonymization-request-button"
+                        title="🔒 Request Data Anonymization"
+                        variant="danger"
+                        onPress={handleAnonymizationRequest}
+                        style={styles.anonymizationButton}
+                      />
+                    )}
 
                     <CustomButton
                       testID="logout-button"
@@ -186,6 +266,13 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
           </View>
         </View>
       </ScrollView>
+
+      {/* Anonymization Dialog */}
+      <AnonymizationDialog
+        visible={showAnonymizationDialog}
+        onClose={() => setShowAnonymizationDialog(false)}
+        onSuccess={handleAnonymizationSuccess}
+      />
     </SafeAreaView>
   );
 }
@@ -335,5 +422,58 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     width: 120,
+  },
+  anonymizationSection: {
+    marginBottom: 24,
+  },
+  statusCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderColor: '#dee2e6',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  statusHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statusLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#6c757d',
+  },
+  statusValue: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  statusDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  statusDetailLabel: {
+    fontSize: 14,
+    color: '#6c757d',
+    flex: 1,
+  },
+  statusDetailValue: {
+    fontSize: 14,
+    color: '#343a40',
+    flex: 2,
+    textAlign: 'right',
+  },
+  anonymizationButton: {
+    backgroundColor: '#dc3545',
+    marginVertical: 4,
   },
 }); 

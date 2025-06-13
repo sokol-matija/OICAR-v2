@@ -403,6 +403,74 @@ export class ApiService {
       method: 'GET',
     });
   }
+
+  // Anonymization methods
+  async submitAnonymizationRequest(requestData: { reason: string; notes?: string }) {
+    console.log('🔒 === APISERVICE SUBMIT ANONYMIZATION REQUEST START ===');
+    console.log('🔒 Request data:', JSON.stringify(requestData, null, 2));
+    
+    // Validate token
+    if (!this.authToken) {
+      console.log('❌ No auth token for anonymization request');
+      throw new Error('Authentication required. Please log in again.');
+    }
+
+    if (!this.isTokenValid()) {
+      console.log('❌ Invalid or expired token for anonymization request');
+      throw new Error('Session expired. Please log in again.');
+    }
+
+    try {
+      const payload = {
+        Reason: requestData.reason,
+        Notes: requestData.notes || '',
+      };
+
+      const response = await this.makeRequest('/users/anonymization-request', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      console.log('✅ Anonymization request submitted successfully:', response);
+      console.log('🔒 === APISERVICE SUBMIT ANONYMIZATION REQUEST END ===');
+      return response;
+      
+    } catch (error) {
+      console.log('💥 Submit anonymization request failed:', error);
+      console.log('🔒 === APISERVICE SUBMIT ANONYMIZATION REQUEST END ===');
+      throw error;
+    }
+  }
+
+  async getAnonymizationRequestStatus() {
+    console.log('🔒 === APISERVICE GET ANONYMIZATION STATUS START ===');
+    
+    // Validate token
+    if (!this.authToken) {
+      console.log('❌ No auth token for anonymization status');
+      throw new Error('Authentication required. Please log in again.');
+    }
+
+    if (!this.isTokenValid()) {
+      console.log('❌ Invalid or expired token for anonymization status');
+      throw new Error('Session expired. Please log in again.');
+    }
+
+    try {
+      const response = await this.makeRequest('/users/anonymization-request/status', {
+        method: 'GET',
+      });
+
+      console.log('✅ Anonymization status retrieved successfully:', response);
+      console.log('🔒 === APISERVICE GET ANONYMIZATION STATUS END ===');
+      return response;
+      
+    } catch (error) {
+      console.log('💥 Get anonymization status failed:', error);
+      console.log('🔒 === APISERVICE GET ANONYMIZATION STATUS END ===');
+      throw error;
+    }
+  }
 }
 
 // Export a singleton instance
