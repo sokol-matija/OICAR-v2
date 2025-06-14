@@ -32,20 +32,7 @@ Here are some quick demos showing how the app works in real life:
 
 *These GIFs show the actual user interface and user flows of both our web and mobile platforms.*
 
-### **Admin Web Portal Demo** 
-## **Google API Integration**
 
-We've integrated Google services for enhanced functionality. You can download our Google API configuration and documentation:
-
-**[Download Google API Setup Guide](https://drive.google.com/your-link-here)**
-
-This includes:
-- Google Maps integration for delivery tracking
-- Google Authentication setup
-- Google Cloud Storage configuration
-- API keys and configuration examples
-
-*Note: Replace the Google Drive link above with your actual download link.*
 
 ## **Live Deployment URLs**
 
@@ -182,6 +169,109 @@ The E2E tests take the longest - about 2-3 minutes total - because they're actua
 - User logout
 
 These tests are really valuable because they catch issues that unit tests might miss. They actually create real data in our Azure database, so you know the whole system is working together properly.
+ 
+## **Running Mobile E2E Tests with Maestro**
+
+We have implemented comprehensive Maestro E2E testing that provides true end-to-end integration testing from UI interactions through our .NET API to Azure SQL Database.
+
+### **Prerequisites for E2E Testing:**
+Before running the E2E tests, make sure you have:
+```bash
+# 1. Maestro installed (if not already installed)
+curl -Ls "https://get.maestro.mobile.dev" | bash
+
+# 2. Mobile app running
+cd OICAR-MobileApp
+npm start
+# Press 'i' for iOS Simulator or 'a' for Android Emulator
+
+# 3. Verify Maestro installation
+maestro --version  # Should show v1.40.3 or newer
+```
+
+### **Running E2E Tests:**
+We have several ways to run the E2E tests depending on what you want to test:
+
+```bash
+cd OICAR-MobileApp
+
+# Run the complete user journey (recommended first test)
+./run-e2e-tests.sh journey
+
+# Run all individual test flows (takes 5-10 minutes)
+./run-e2e-tests.sh all
+
+# Run specific test flows
+maestro test .maestro/01-registration-flow.yaml    # User registration
+maestro test .maestro/02-login-flow.yaml          # Authentication  
+maestro test .maestro/03-item-browsing-flow.yaml  # Product browsing
+maestro test .maestro/04-add-to-cart-flow.yaml    # Shopping cart
+maestro test .maestro/05-complete-purchase-flow.yaml # Full purchase
+maestro test .maestro/06-logout-flow.yaml         # Session cleanup
+
+# Debug mode (if tests fail)
+maestro test .maestro/01-registration-flow.yaml --debug
+```
+
+### **Opening Maestro Studio:**
+Maestro Studio is a visual tool that lets you create and debug tests interactively. It's really helpful for understanding how the tests work or creating new ones.
+
+```bash
+# Start Maestro Studio (opens in browser)
+maestro studio
+
+# This will:
+# 1. Open your browser to http://localhost:9999
+# 2. Connect to your running mobile app
+# 3. Let you record new tests or debug existing ones
+# 4. Show real-time app hierarchy and interactions
+```
+
+In Maestro Studio you can:
+- Record new test flows by clicking through your app
+- Debug failing tests step by step
+- Inspect the app hierarchy and element selectors
+- Test individual commands before adding them to test files
+- Export recorded flows as YAML test files
+
+### **What These E2E Tests Actually Do:**
+Our Maestro tests are comprehensive integration tests that:
+
+**Real Integration Testing:**
+- Test the actual mobile app UI (React Native components)
+- Make real HTTP requests to our Azure API
+- Create actual data in our Azure SQL Database
+- Validate complete user workflows end-to-end
+
+**Test Coverage:**
+- **Registration Flow**: Creates real user accounts in the database
+- **Login Flow**: Tests JWT authentication with the API
+- **Item Browsing**: Validates product catalog API integration
+- **Shopping Cart**: Tests cart persistence and calculations
+- **Purchase Flow**: Creates real orders in the database
+- **Logout Flow**: Validates session cleanup and security
+
+**Database Impact:**
+Every test run creates real production data in Azure SQL:
+- User accounts (testuser_*, e2euser_*)
+- Shopping cart items
+- Complete order records
+- Authentication logs
+
+### **Test Results and Debugging:**
+Test results are saved in the `test-results/` directory with detailed logs:
+```bash
+# View recent test results
+ls -la test-results/
+
+# Check specific test logs
+cat test-results/registration-flow_20241214_143022.log
+
+# Monitor test execution in real-time
+tail -f test-results/complete-user-journey_*.log
+```
+
+If tests fail, the logs will show exactly which step failed and why, making it easy to debug issues with either the app or the API.
 
 ### **Viewing Test Results:**
 When you run tests locally, you'll see the results right in your terminal. But if you want to see how tests run in our CI/CD pipeline, you can check the GitHub Actions tab in our repository. Every time we push code, all tests run automatically and you can see the live results there.
