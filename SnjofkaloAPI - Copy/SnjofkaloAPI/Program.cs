@@ -13,7 +13,7 @@ using SnjofkaloAPI.Services.Interfaces;
 using DotNetEnv;
 
 // fixing for redeployment - testing Azure environment variables override
-
+// trigger test 
 var builder = WebApplication.CreateBuilder(args);
 
 // Load .env file for local development
