@@ -11,6 +11,8 @@ using SnjofkaloAPI.Data.Interceptors;
 using SnjofkaloAPI.Services.Implementation;
 using SnjofkaloAPI.Services.Interfaces;
 
+// fixing for redeployment - testing Azure environment variables override
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog
