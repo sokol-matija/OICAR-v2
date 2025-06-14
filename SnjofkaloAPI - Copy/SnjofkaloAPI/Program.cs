@@ -10,10 +10,17 @@ using SnjofkaloAPI.Data;
 using SnjofkaloAPI.Data.Interceptors;
 using SnjofkaloAPI.Services.Implementation;
 using SnjofkaloAPI.Services.Interfaces;
+using DotNetEnv;
 
 // fixing for redeployment - testing Azure environment variables override
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load .env file for local development
+if (builder.Environment.IsDevelopment())
+{
+    Env.Load();
+}
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
