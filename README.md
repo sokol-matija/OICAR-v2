@@ -128,7 +128,8 @@ dotnet test --filter "AuthController" # Specific test class
 cd OICAR-MobileApp
 npm test -- --watchAll=false          # Run all tests
 npm test -- --watch                   # Interactive mode
-npm test -- --coverage                # Coverage report
+npm test -- --coverage         
+npm test --passWithNoTests --watchAll=false       
 ```
 
 ## **Development Workflow**
