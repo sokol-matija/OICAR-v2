@@ -22,16 +22,17 @@ For start I have first dockerized the Microsoft SQL database but we have later m
 
 Here are some quick demos showing how the app works in real life:
 
+### **Web Marketplace Demo**
+![OICAR Web Marketplace](CleanShot-Vivaldi-Snjofkalo%20Marketplace%20-%20Vivaldi-at.2025-06-14.gif)
+*Web platform: Login → Browse marketplace → Secure shopping experience*
+
 ### **Mobile App User Journey**
-![OICAR Mobile Demo](path/to/mobile-demo.gif)
-*Complete user flow: Registration → Login → Browse Items → Add to Cart → Checkout*
+![OICAR Mobile Demo](CleanShot-qemu-system-aarch64-Android%20Emulator%20-%20Medium_Phone_API_365554-at.2025-06-14.gif)
+*Mobile app: Registration → Login → Browse Items → Add to Cart → Complete user experience*
 
-### **Admin Web Portal Demo**  
-![OICAR Admin Demo](path/to/admin-demo.gif)
-*Admin features: User management → Item management → Order tracking*
+*These GIFs show the actual user interface and user flows of both our web and mobile platforms.*
 
-*Note: Replace the paths above with your actual GIF files once you create them. For best results, keep GIFs under 10MB and 60 seconds each.*
-
+### **Admin Web Portal Demo** 
 ## **Google API Integration**
 
 We've integrated Google services for enhanced functionality. You can download our Google API configuration and documentation:
