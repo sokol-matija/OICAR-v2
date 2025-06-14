@@ -20,7 +20,6 @@ export class ProfileService {
     try {
       const token = this.getToken();
       const url = `${API_BASE_URL}/users/profile`;
-      console.log('🔍 Get user profile with anonymization:', { url });
       
       const response = await fetch(url, {
         method: 'GET',
@@ -30,18 +29,13 @@ export class ProfileService {
         },
       });
 
-      console.log('📡 Get profile response status:', response.status);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Get profile error:', errorText);
+        console.log('Get profile error:', errorText);
         throw new Error(errorText || 'Failed to load profile');
       }
 
       const response_data = await response.json();
-      console.log('🔍 Raw API response:', JSON.stringify(response_data, null, 2));
-      
-      // Handle the API response format
       const data = response_data.data || response_data;
       
       // Convert backend naming to frontend naming
@@ -65,11 +59,9 @@ export class ProfileService {
         } : undefined,
       };
       
-      console.log('✅ Mapped profile data with anonymization:', JSON.stringify(mappedData, null, 2));
-      
       return mappedData;
     } catch (error) {
-      console.log('💥 Get profile exception:', error);
+      console.log('Get profile exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to load profile');
     }
   }
@@ -87,8 +79,6 @@ export class ProfileService {
         Notes: requestData.notes || '',
       };
       
-      console.log('🔍 Submit anonymization request:', { url, payload });
-      
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -98,18 +88,13 @@ export class ProfileService {
         body: JSON.stringify(payload),
       });
 
-      console.log('📡 Submit anonymization request response status:', response.status);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Submit anonymization request error:', errorText);
+        console.log('Submit anonymization request error:', errorText);
         throw new Error(errorText || 'Failed to submit anonymization request');
       }
 
       const response_data = await response.json();
-      console.log('✅ Anonymization request submitted:', JSON.stringify(response_data, null, 2));
-      
-      // Handle the API response format
       const data = response_data.data || response_data;
       
       return {
@@ -126,7 +111,7 @@ export class ProfileService {
         message: response_data.message || 'Anonymization request submitted successfully',
       };
     } catch (error) {
-      console.log('💥 Submit anonymization request exception:', error);
+      console.log('Submit anonymization request exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to submit anonymization request');
     }
   }
@@ -138,7 +123,6 @@ export class ProfileService {
     try {
       const token = this.getToken();
       const url = `${API_BASE_URL}/users/anonymization-request/status`;
-      console.log('🔍 Get anonymization request status:', { url });
       
       const response = await fetch(url, {
         method: 'GET',
@@ -148,8 +132,6 @@ export class ProfileService {
         },
       });
 
-      console.log('📡 Get anonymization status response status:', response.status);
-
       if (response.status === 404) {
         // No anonymization request found
         console.log('ℹ️ No anonymization request found for user');
@@ -158,14 +140,11 @@ export class ProfileService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Get anonymization status error:', errorText);
+        console.log('Get anonymization status error:', errorText);
         throw new Error(errorText || 'Failed to get anonymization request status');
       }
 
       const response_data = await response.json();
-      console.log('✅ Anonymization request status:', JSON.stringify(response_data, null, 2));
-      
-      // Handle the API response format
       const data = response_data.data || response_data;
       
       return {
@@ -178,7 +157,7 @@ export class ProfileService {
         notes: data.Notes || data.notes,
       };
     } catch (error) {
-      console.log('💥 Get anonymization status exception:', error);
+      console.log('Get anonymization status exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to get anonymization request status');
     }
   }

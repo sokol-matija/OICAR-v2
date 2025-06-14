@@ -46,16 +46,16 @@ export default function ProfileScreen({ token, onEditProfile, onLogout }: Profil
       setLoading(true);
       setError(null);
       
-      console.log('🔍 Loading profile with token:', token.substring(0, 20) + '...');
+      console.log('Loading profile with token:', token.substring(0, 20) + '...');
       
-      console.log('🚀 Fetching profile with anonymization status...');
+      console.log('Fetching profile with anonymization status...');
       const profile = await ProfileService.getUserProfileWithAnonymization();
-      console.log('✅ Profile loaded with anonymization status:', profile);
+      console.log('Profile loaded with anonymization status:', profile);
       
       setUserProfile(profile);
       setAnonymizationRequest(profile.anonymizationRequest || null);
     } catch (error) {
-      console.log('💥 Profile loading error:', error);
+      console.log('Profile loading error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to load profile';
       setError(errorMessage);
       Alert.alert('Error Loading Profile', errorMessage);

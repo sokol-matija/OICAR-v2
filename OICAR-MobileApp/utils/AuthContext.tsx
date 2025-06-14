@@ -47,21 +47,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      console.log('🔐 Starting login process...');
       
-      // Test connectivity first
-      console.log('🌐 Testing network connectivity before login...');
       const isConnected = await apiService.testConnectivity();
       if (!isConnected) {
         throw new Error('Network connectivity test failed. Please check your internet connection.');
       }
-      console.log('🌐 Network connectivity test passed');
       
       const response = await apiService.login({ email, password });
-      console.log('🔐 Login response:', response);
       
       if (response.success && response.data) {
-        // Extract user data from the response
         const userData = response.data.user;
         const mappedUser: User = {
           id: userData.idUser || userData.id,
@@ -73,13 +67,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
         
         setUser(mappedUser);
-        console.log('🔐 User logged in successfully:', mappedUser);
-        // You might want to save token to AsyncStorage here
       } else {
         throw new Error('Login failed: Invalid response format');
       }
     } catch (error) {
-      console.error('💥 Login failed:', error);
+      console.error('Login failed:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -95,7 +87,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setIsLoading(true);
       const response = await apiService.register(userData);
-      // Auto-login after successful registration
       await login(userData.email, userData.password);
     } catch (error) {
       console.error('Registration failed:', error);
@@ -110,8 +101,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsLoading(true);
       await apiService.logout();
       setUser(null);
-      console.log('🔐 User logged out successfully');
-      // You might want to clear AsyncStorage here
     } catch (error) {
       console.error('Logout failed:', error);
       throw error;

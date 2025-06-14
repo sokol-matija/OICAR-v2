@@ -47,7 +47,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
     if (!token) return;
 
     try {
-      console.log('🛒 Loading cart...');
+      console.log('Loading cart...');
       
       const userCart = await CartService.getUserCart();
       setCart(userCart);
@@ -61,7 +61,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
               const product = products.find(p => p.idItem === cartItem.itemID);
               return { ...cartItem, product };
             } catch (error) {
-              console.log('❌ Failed to load product for cart item:', cartItem.itemID);
+              console.log('Failed to load product for cart item:', cartItem.itemID);
               return cartItem;
             }
           })
@@ -71,9 +71,9 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
         setCartItems([]);
       }
 
-      console.log('✅ Cart loaded successfully');
+      console.log('Cart loaded successfully');
     } catch (error) {
-      console.log('❌ Failed to load cart:', error);
+      console.log('Failed to load cart:', error);
       Alert.alert('Error', 'Failed to load cart');
     } finally {
       setLoading(false);
@@ -98,13 +98,13 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
   };
 
   const handleCheckout = async () => {
-    console.log('🛒 === CHECKOUT DEBUG START ===');
-    console.log('🛒 Token available:', !!token);
-    console.log('🛒 Cart available:', !!cart);
-    console.log('🛒 Cart items count:', cartItems.length);
+    console.log('CHECKOUT DEBUG START');
+    console.log('Token available:', !!token);
+    console.log('Cart available:', !!cart);
+    console.log('Cart items count:', cartItems.length);
     
     if (!cart || cartItems.length === 0) {
-      console.log('❌ No cart or cart items for checkout');
+      console.log('No cart or cart items for checkout');
       Alert.alert('Empty Cart', 'Please add items to your cart before checkout');
       return;
     }
@@ -113,12 +113,12 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
 
     try {
       // Use apiService checkout method which handles token validation and user ID extraction
-      console.log('🛒 Starting checkout via apiService...');
+      console.log('Starting checkout via apiService...');
       const orderResponse = await apiService.checkout() as any;
       
       if (orderResponse && orderResponse.success && orderResponse.data) {
         const createdOrder = orderResponse.data;
-        console.log('✅ Order created:', JSON.stringify(createdOrder, null, 2));
+        console.log('Order created:', JSON.stringify(createdOrder, null, 2));
 
         // Update local state - clear cart
         setCart(null);
@@ -146,12 +146,12 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
           ]
         );
 
-        console.log('✅ Checkout completed successfully');
+        console.log('Checkout completed successfully');
       } else {
         throw new Error(orderResponse?.message || 'Order creation failed');
       }
     } catch (error) {
-      console.log('💥 Checkout error:', error);
+      console.log('Checkout error:', error);
       Alert.alert(
         'Checkout Failed',
         error instanceof Error ? error.message : 'An error occurred during checkout. Please try again.',
@@ -159,7 +159,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
       );
     } finally {
       setCheckingOut(false);
-      console.log('🛒 === CHECKOUT DEBUG END ===');
+      console.log('CHECKOUT DEBUG END');
     }
   };
 
@@ -185,7 +185,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
               await loadCart();
               Alert.alert('Success', 'Item removed from cart');
             } catch (error) {
-              console.log('❌ Remove item error:', error);
+              console.log('Remove item error:', error);
               Alert.alert('Error', 'Failed to remove item from cart');
             } finally {
               setUpdatingItem(null);
@@ -223,7 +223,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ token, onNavigateToOrders }) =>
               await loadCart();
               Alert.alert('Success', 'Quantity updated');
             } catch (error) {
-              console.log('❌ Update quantity error:', error);
+              console.log('Update quantity error:', error);
               Alert.alert('Error', 'Failed to update quantity');
             } finally {
               setUpdatingItem(null);

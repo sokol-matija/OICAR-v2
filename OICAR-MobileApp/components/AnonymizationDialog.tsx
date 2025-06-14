@@ -52,8 +52,6 @@ export default function AnonymizationDialog({
 
     setLoading(true);
     try {
-      console.log('🔒 Submitting anonymization request:', formData);
-      
       await ProfileService.submitAnonymizationRequest(formData);
       
       Alert.alert(
@@ -70,7 +68,7 @@ export default function AnonymizationDialog({
         ]
       );
     } catch (error) {
-      console.log('💥 Anonymization request failed:', error);
+      console.log('Anonymization request failed:', error);
       Alert.alert(
         'Request Failed',
         error instanceof Error ? error.message : 'Failed to submit anonymization request. Please try again.',
@@ -99,24 +97,21 @@ export default function AnonymizationDialog({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/* Header */}
           <LinearGradient
             colors={['#dc3545', '#c82333']}
             style={styles.header}
           >
             <View style={styles.headerContent}>
-              <Text style={styles.headerTitle}>🔒 Request Data Anonymization</Text>
+              <Text style={styles.headerTitle}>Request Data Anonymization</Text>
               <Text style={styles.headerSubtitle}>
                 This will permanently remove your personal data from our system
               </Text>
             </View>
           </LinearGradient>
 
-          {/* Content */}
           <View style={styles.content}>
-            {/* Warning Notice */}
             <View style={styles.warningCard}>
-              <Text style={styles.warningIcon}>⚠️</Text>
+              <Text style={styles.warningIcon}>!</Text>
               <Text style={styles.warningTitle}>Important Notice</Text>
               <Text style={styles.warningText}>
                 • This action cannot be undone{'\n'}
@@ -126,7 +121,6 @@ export default function AnonymizationDialog({
               </Text>
             </View>
 
-            {/* Form */}
             <View style={styles.formSection}>
               <Text style={styles.sectionTitle}>Tell us why you want to anonymize your data:</Text>
               
@@ -176,16 +170,14 @@ export default function AnonymizationDialog({
               </View>
             </View>
 
-            {/* GDPR Notice */}
             <View style={styles.gdprCard}>
-              <Text style={styles.gdprTitle}>📋 Your Rights Under GDPR</Text>
+              <Text style={styles.gdprTitle}>Your Rights Under GDPR</Text>
               <Text style={styles.gdprText}>
                 You have the right to request erasure of your personal data under Article 17 of the GDPR. 
                 We will process your request within 30 days and notify you of the outcome.
               </Text>
             </View>
 
-            {/* Action Buttons */}
             <View style={styles.buttonContainer}>
               <CustomButton
                 title="Submit Request"

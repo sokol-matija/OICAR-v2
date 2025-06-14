@@ -33,7 +33,7 @@ export default function HomeScreen({ token, onLogout, onNavigateToProfile }: Hom
           {/* Welcome Card */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>🎉 Welcome to Snjofkalo!</Text>
+              <Text style={styles.cardTitle}>Welcome to Snjofkalo!</Text>
             </View>
             
             <View style={styles.cardBody}>
@@ -43,10 +43,10 @@ export default function HomeScreen({ token, onLogout, onNavigateToProfile }: Hom
               
               <View style={styles.infoSection}>
                 <Text style={styles.sectionTitle}>Quick Actions:</Text>
-                <Text style={styles.actionText}>🛍️ Browse Products</Text>
-                <Text style={styles.actionText}>🛒 View Cart</Text>
-                <Text style={styles.actionText}>📦 My Orders</Text>
-                <Text style={styles.actionText}>👤 My Profile</Text>
+                <Text style={styles.actionText}>Browse Products</Text>
+                <Text style={styles.actionText}>View Cart</Text>
+                <Text style={styles.actionText}>My Orders</Text>
+                <Text style={styles.actionText}>My Profile</Text>
               </View>
             </View>
           </View>

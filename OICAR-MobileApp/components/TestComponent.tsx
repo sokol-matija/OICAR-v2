@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function TestComponent() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>✅ App is working!</Text>
+      <Text style={styles.text}>App is working!</Text>
       <Text style={styles.subtext}>If you can see this, the Android display is fixed</Text>
     </View>
   );

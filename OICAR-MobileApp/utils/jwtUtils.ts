@@ -19,40 +19,40 @@ export interface JWTPayload {
 export class JWTUtils {
   static parseToken(token: string): JWTPayload | null {
     try {
-      console.log('🔍 Parsing JWT token...');
+      console.log('Parsing JWT token...');
       
       // JWT has 3 parts separated by dots: header.payload.signature
       const parts = token.split('.');
       if (parts.length !== 3) {
-        console.log('❌ Invalid JWT format - expected 3 parts, got:', parts.length);
+        console.log('Invalid JWT format - expected 3 parts, got:', parts.length);
         return null;
       }
 
       // Decode the payload (base64url)
       const payload = parts[1];
-      console.log('🔍 Raw payload (base64):', payload);
+      console.log('Raw payload (base64):', payload);
       
       // Add padding if needed for base64 decoding
       const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
       const decodedPayload = atob(paddedPayload.replace(/-/g, '+').replace(/_/g, '/'));
-      console.log('🔍 Decoded payload (JSON string):', decodedPayload);
+      console.log('Decoded payload (JSON string):', decodedPayload);
       
       const parsedPayload = JSON.parse(decodedPayload) as JWTPayload;
-      console.log('🔍 Parsed JWT payload:', JSON.stringify(parsedPayload, null, 2));
-      console.log('🔍 Available claims:', Object.keys(parsedPayload));
-      console.log('🔍 User ID claim:', parsedPayload.id);
-      console.log('🔍 Username claim:', parsedPayload.sub);
-      console.log('🔍 Role claim:', parsedPayload.role);
+          console.log('Parsed JWT payload:', JSON.stringify(parsedPayload, null, 2));
+    console.log('Available claims:', Object.keys(parsedPayload));
+    console.log('User ID claim:', parsedPayload.id);
+    console.log('Username claim:', parsedPayload.sub);
+    console.log('Role claim:', parsedPayload.role);
       
       return parsedPayload;
     } catch (error) {
-      console.log('💥 JWT parsing error:', error);
+      console.log('JWT parsing error:', error);
       return null;
     }
   }
 
   static getUserIdFromToken(token: string): number | null {
-    console.log('🔍 Extracting user ID from token...');
+    console.log('Extracting user ID from token...');
     const payload = this.parseToken(token);
     if (payload) {
       // Try different claim formats
@@ -61,18 +61,18 @@ export class JWTUtils {
                     payload.sub;
       
       if (userId) {
-        console.log('🔍 Found user ID in payload:', userId);
-        const parsedUserId = parseInt(userId, 10);
-        console.log('🔍 Parsed user ID as number:', parsedUserId);
+              console.log('Found user ID in payload:', userId);
+      const parsedUserId = parseInt(userId, 10);
+      console.log('Parsed user ID as number:', parsedUserId);
         return isNaN(parsedUserId) ? null : parsedUserId;
       }
     }
-    console.log('❌ No user ID found in token payload');
+    console.log('No user ID found in token payload');
     return null;
   }
 
   static getUsernameFromToken(token: string): string | null {
-    console.log('🔍 Extracting username from token...');
+    console.log('Extracting username from token...');
     const payload = this.parseToken(token);
     if (payload) {
       // Try different claim formats
@@ -81,16 +81,16 @@ export class JWTUtils {
                       payload.username;
       
       if (username) {
-        console.log('🔍 Found username in payload:', username);
+        console.log('Found username in payload:', username);
         return username;
       }
     }
-    console.log('❌ No username found in token payload');
+    console.log('No username found in token payload');
     return null;
   }
 
   static getEmailFromToken(token: string): string | null {
-    console.log('🔍 Extracting email from token...');
+    console.log('Extracting email from token...');
     const payload = this.parseToken(token);
     if (payload) {
       // Try different claim formats
@@ -98,11 +98,11 @@ export class JWTUtils {
                    payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
       
       if (email) {
-        console.log('🔍 Found email in payload:', email);
+        console.log('Found email in payload:', email);
         return email;
       }
     }
-    console.log('❌ No email found in token payload');
+    console.log('No email found in token payload');
     return null;
   }
 

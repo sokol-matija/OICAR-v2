@@ -1,6 +1,6 @@
 # Native Mobile Deployment Guide
 
-## 📱 Expo EAS Build (FREE)
+## Expo EAS Build (FREE)
 
 ### Step 1: Setup EAS
 ```bash
@@ -40,12 +40,12 @@ eas build --platform ios --profile preview
 - Requires TestFlight or App Store
 - Needs Apple Developer Account
 
-## 🆓 Free Limits
+## Free Limits
 - **EAS Build**: 30 builds/month free
 - **Android builds**: Completely free
 - **iOS builds**: Free but need Apple Developer Account for installation
 
-## 🎯 Best for Project Requirements
+## Best for Project Requirements
 For academic project demonstration:
 1. **Web deployment (Vercel)** - Easiest, immediate access
 2. **Android APK** - Native app experience

@@ -58,9 +58,9 @@ export default function CreateItemScreen({ token, onItemCreated, onCancel }: Cre
       setLoading(true);
       const categoryList = await ProductService.getAllCategories();
       setCategories(categoryList);
-      console.log('✅ Loaded categories for item creation:', categoryList.length);
+      console.log('Loaded categories for item creation:', categoryList.length);
     } catch (error) {
-      console.log('💥 Error loading categories:', error);
+      console.log('Error loading categories:', error);
       Alert.alert('Error', 'Failed to load categories. Please try again.');
     } finally {
       setLoading(false);
@@ -151,7 +151,7 @@ export default function CreateItemScreen({ token, onItemCreated, onCancel }: Cre
         });
       }
     } catch (error) {
-      console.log('💥 Error picking image:', error);
+              console.log('Error picking image:', error);
       Alert.alert('Error', 'Failed to select image. Please try again.');
     }
   };
@@ -245,7 +245,7 @@ export default function CreateItemScreen({ token, onItemCreated, onCancel }: Cre
         throw new Error(response.message || 'Failed to create item');
       }
     } catch (error) {
-      console.log('💥 Error creating item:', error);
+              console.log('Error creating item:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to create item';
       Alert.alert('Error', errorMessage);
     } finally {

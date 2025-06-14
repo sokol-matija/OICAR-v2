@@ -68,12 +68,12 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token, onReorderItems }) =>
         status: statusesData.find(status => status.idStatus === order.statusID)
       }));
 
-      console.log('✅ Loaded orders with status:', JSON.stringify(ordersWithStatus, null, 2));
-      console.log('🔍 Order totalAmounts:', ordersWithStatus.map(o => ({ id: o.idOrder, total: o.totalAmount })));
+      console.log('Loaded orders with status:', JSON.stringify(ordersWithStatus, null, 2));
+      console.log('Order totalAmounts:', ordersWithStatus.map(o => ({ id: o.idOrder, total: o.totalAmount })));
       setOrders(ordersWithStatus);
       
     } catch (error) {
-      console.log('💥 Load orders error:', error);
+      console.log('Load orders error:', error);
       
       // Handle 403 errors (no orders) more gracefully
       if (error instanceof Error && (error.message.includes('403') || error.message.includes('Forbidden'))) {
@@ -153,7 +153,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ token, onReorderItems }) =>
       testID={`order-item-${item.idOrder}`}
       style={styles.orderCard}
       onPress={() => {
-        console.log('🔍 Order item clicked:', { id: item.idOrder, total: item.totalAmount });
+        console.log('Order item clicked:', { id: item.idOrder, total: item.totalAmount });
         setSelectedOrderId(item.idOrder);
       }}
     >

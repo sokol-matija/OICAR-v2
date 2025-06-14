@@ -18,6 +18,33 @@ The web frontend is an angular application using angular 17 with all the best mo
 
 For start I have first dockerized the Microsoft SQL database but we have later moved on to using a live database that I have deployed on on Azure
 
+## **User Demo Videos**
+
+Here are some quick demos showing how the app works in real life:
+
+### **Mobile App User Journey**
+![OICAR Mobile Demo](path/to/mobile-demo.gif)
+*Complete user flow: Registration → Login → Browse Items → Add to Cart → Checkout*
+
+### **Admin Web Portal Demo**  
+![OICAR Admin Demo](path/to/admin-demo.gif)
+*Admin features: User management → Item management → Order tracking*
+
+*Note: Replace the paths above with your actual GIF files once you create them. For best results, keep GIFs under 10MB and 60 seconds each.*
+
+## **Google API Integration**
+
+We've integrated Google services for enhanced functionality. You can download our Google API configuration and documentation:
+
+**[Download Google API Setup Guide](https://drive.google.com/your-link-here)**
+
+This includes:
+- Google Maps integration for delivery tracking
+- Google Authentication setup
+- Google Cloud Storage configuration
+- API keys and configuration examples
+
+*Note: Replace the Google Drive link above with your actual download link.*
 
 ## **Live Deployment URLs**
 
@@ -49,7 +76,6 @@ We have 41 API tests that are using XUnit + Moq + FluentAssertions
 We also have 17 mobile tests that are using Jest + Jest Expo + React Native Testing Library.
 
 The idea is that the test will run when deploying to production. So, integration tests should run before every deployment and that will protect and block deployment if those tests fail. 
-
 
 ##  **Quick Start**
 This part should help you start the application on your machine.
@@ -112,25 +138,52 @@ nmp start
 # Web available at: http://localhost:4200/
 ```
 
-##  **Manual Testing Commands**
-For the testing of the application, we can run the test manually. Once we get into the API test directory.
+##  **Running Tests Manually**
 
-### **API Tests:**
+So we have three different types of tests that you can run to make sure everything is working properly. Let me walk you through how to run each one.
+
+### **API Tests (Unit & Integration):**
+These test our .NET backend to make sure all the endpoints work correctly and the business logic is solid.
 ```bash
 cd SnjofkaloAPI.Tests
-dotnet test                           # Run all tests
-dotnet test --verbosity detailed      # Detailed output  
-dotnet test --filter "AuthController" # Specific test class
+dotnet test                           # Run all 41 tests
+dotnet test --verbosity detailed      # See detailed output with more info
+dotnet test --filter "AuthController" # Run just the authentication tests
+dotnet test --logger "console;verbosity=detailed" # Even more detailed logging
 ```
 
-### **Mobile Tests:**
+The API tests are pretty fast - they usually finish in under a second. If any fail, you'll see exactly which test broke and why.
+
+### **Mobile Tests (Jest + React Native):**
+These test our React Native mobile app components and utilities to make sure the UI works correctly.
 ```bash
 cd OICAR-MobileApp
-npm test -- --watchAll=false          # Run all tests
-npm test -- --watch                   # Interactive mode
-npm test -- --coverage         
-npm test --passWithNoTests --watchAll=false       
+npm test -- --watchAll=false          # Run all 17 mobile tests once
+npm test -- --watch                   # Run tests and watch for changes
+npm test -- --coverage                # Run tests and show code coverage
+npm test --passWithNoTests --watchAll=false # Run even if no test files found
 ```
+
+The mobile tests take a bit longer - usually around 3-4 seconds. They test things like user authentication, cart functionality, and API integration.
+
+### **End-to-End Tests (Maestro):**
+These are the really cool tests that actually simulate a real user using the app. They test the complete user journey from registration to checkout.
+```bash
+cd OICAR-MobileApp
+./run-e2e-tests.sh                    # Run all 6 E2E test flows
+```
+
+The E2E tests take the longest - about 2-3 minutes total - because they're actually clicking through the app like a real user would. They test:
+- User registration and login
+- Browsing items and searching
+- Adding items to cart
+- Complete checkout process
+- User logout
+
+These tests are really valuable because they catch issues that unit tests might miss. They actually create real data in our Azure database, so you know the whole system is working together properly.
+
+### **Viewing Test Results:**
+When you run tests locally, you'll see the results right in your terminal. But if you want to see how tests run in our CI/CD pipeline, you can check the GitHub Actions tab in our repository. Every time we push code, all tests run automatically and you can see the live results there.
 
 ## **Development Workflow**
 
@@ -178,8 +231,6 @@ ENCRYPTION_KEY=your-encryption-key
 ```
 
 But honestly, for development you probably don't need to mess with this since I've already configured everything to work with our Azure database.
-
-
 
 ## Common Issues and How to Fix Them
 
@@ -239,8 +290,15 @@ The build process will ask you to log in to your Expo account if you haven't alr
 
 Just keep in mind that this creates a development build, so it's not optimized for production. But it's perfect for testing and sharing with your team.
 
-This is my latest version of the app. It has a G drive link so you can download it for yourself.
-https://drive.google.com/drive/folders/1J2PYLjEgZNwkMuWmLByXAmeFHYRVgZqW?usp=drive_link
+## **Download Latest APK**
 
+### **Direct APK Download:**
+**Latest Version (v3)**: https://expo.dev/artifacts/eas/9rxozu3ceYzmH9Qq8LMzwo.apk
+
+This APK can be installed directly on any Android device. Just download and install it to test the app without needing the Play Store.
+
+### **Google Drive Backup:**
+
+https://drive.google.com/drive/folders/1J2PYLjEgZNwkMuWmLByXAmeFHYRVgZqW?usp=sharing
 
 

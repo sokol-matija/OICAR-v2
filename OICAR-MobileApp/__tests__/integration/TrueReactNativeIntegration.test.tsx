@@ -106,7 +106,7 @@ describe('React Native Integration Tests - Deployment Ready', () => {
 
   const TEST_TIMEOUT = 8000;
 
-  // TEST 1: Profile Screen Integration (GUARANTEED PASS) ✅
+  // TEST 1: Profile Screen Integration (GUARANTEED PASS)
   test('Profile screen integrates service calls with UI rendering', async () => {
     mockProfileService.getUserProfileWithAnonymization.mockResolvedValue({
       idUser: 1,
@@ -137,7 +137,7 @@ describe('React Native Integration Tests - Deployment Ready', () => {
     }, { timeout: 3000 });
   }, TEST_TIMEOUT);
 
-  // TEST 2: Login Screen UI Integration (SIMPLIFIED) ✅
+  // TEST 2: Login Screen UI Integration (SIMPLIFIED)
   test('Login screen renders and handles user interactions', async () => {
     const mockLogin = jest.fn().mockResolvedValue(undefined);
     const mockOnLoginSuccess = jest.fn();
@@ -168,7 +168,7 @@ describe('React Native Integration Tests - Deployment Ready', () => {
     expect(passwordInput.props.value).toBe('password123');
   }, TEST_TIMEOUT);
 
-  // TEST 3: Products Screen Integration (SIMPLIFIED) ✅
+  // TEST 3: Products Screen Integration (SIMPLIFIED)
   test('Products screen integrates data loading with UI display', async () => {
     const mockProducts = [
       { idItem: 1, itemCategoryID: 1, title: 'iPhone 15', description: 'Latest iPhone', stockQuantity: 10, price: 999.99, weight: 0.2 },
@@ -201,7 +201,7 @@ describe('React Native Integration Tests - Deployment Ready', () => {
     expect(searchInput).toBeTruthy();
   }, TEST_TIMEOUT);
 
-  // TEST 4: Cart Screen Integration (SIMPLIFIED) ✅
+  // TEST 4: Cart Screen Integration (SIMPLIFIED)
   test('Cart screen integrates service calls with component rendering', async () => {
     const mockCart = {
       idCart: 1,
@@ -233,7 +233,7 @@ describe('React Native Integration Tests - Deployment Ready', () => {
     expect(renderResult).toBeTruthy();
   }, TEST_TIMEOUT);
 
-  // TEST 5: Navigation and Auth State Integration (SIMPLIFIED) ✅
+  // TEST 5: Navigation and Auth State Integration (SIMPLIFIED)
   test('Components maintain auth state consistency across navigation', async () => {
     mockProfileService.getUserProfileWithAnonymization.mockResolvedValue({
       idUser: 1,

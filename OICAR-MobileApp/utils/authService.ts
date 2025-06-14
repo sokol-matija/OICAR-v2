@@ -10,7 +10,7 @@ export class AuthService {
         Password: loginData.password,
       };
       
-      console.log('🔍 Login attempt:', { url, payload: { ...payload, Password: '[HIDDEN]' } });
+      console.log('Login attempt:', { url, payload: { ...payload, Password: '[HIDDEN]' } });
       
       const response = await fetch(url, {
         method: 'POST',
@@ -20,20 +20,20 @@ export class AuthService {
         body: JSON.stringify(payload),
       });
 
-      console.log('📡 Login response status:', response.status);
+      console.log('Login response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Login error:', errorText);
+        console.log('Login error:', errorText);
         throw new Error(errorText || 'Login failed');
       }
 
       const data = await response.json();
-      console.log('✅ Login success - Full response:', data);
-      console.log('🔑 Token value:', data.data?.token || data.Token || data.token);
+          console.log('Login success - Full response:', data);
+    console.log('Token value:', data.data?.token || data.Token || data.token);
       return { token: data.data?.token || data.Token || data.token };
     } catch (error) {
-      console.log('💥 Login exception:', error);
+      console.log('Login exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Login failed');
     }
   }
@@ -51,7 +51,7 @@ export class AuthService {
         PhoneNumber: registerData.phoneNumber,
       };
       
-      console.log('🔍 Register attempt:', { url, payload: { ...payload, Password: '[HIDDEN]' } });
+      console.log('Register attempt:', { url, payload: { ...payload, Password: '[HIDDEN]' } });
       
       const response = await fetch(url, {
         method: 'POST',
@@ -61,19 +61,19 @@ export class AuthService {
         body: JSON.stringify(payload),
       });
 
-      console.log('📡 Register response status:', response.status);
+      console.log('Register response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Register error:', errorText);
+        console.log('Register error:', errorText);
         throw new Error(errorText || 'Registration failed');
       }
 
       const data = await response.json();
-      console.log('✅ Register success:', data);
+      console.log('Register success:', data);
       return data.message || 'Registration successful';
     } catch (error) {
-      console.log('💥 Register exception:', error);
+      console.log('Register exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Registration failed');
     }
   }

@@ -16,7 +16,7 @@ export class UserService {
     try {
       const token = this.getToken();
       const url = `${API_BASE_URL}/users/profile`;
-      console.log('🔍 Get user profile:', { url });
+      console.log('Get user profile:', { url });
       
       const response = await fetch(url, {
         method: 'GET',
@@ -26,20 +26,20 @@ export class UserService {
         },
       });
 
-      console.log('📡 Get profile response status:', response.status);
+      console.log('Get profile response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Get profile error:', errorText);
+        console.log('Get profile error:', errorText);
         throw new Error(errorText || 'Failed to load profile');
       }
 
       const response_data = await response.json();
-      console.log('🔍 Raw API response:', JSON.stringify(response_data, null, 2));
+      console.log('Raw API response:', JSON.stringify(response_data, null, 2));
       
       // Handle the new API response format
       const data = response_data.data || response_data;
-      console.log('🔍 Available fields:', Object.keys(data));
+      console.log('Available fields:', Object.keys(data));
       
       // Convert backend naming to frontend naming
       const mappedData = {
@@ -52,11 +52,11 @@ export class UserService {
         isAdmin: data.IsAdmin || data.isAdmin || false,
       };
       
-      console.log('✅ Mapped profile data:', JSON.stringify(mappedData, null, 2));
+      console.log('Mapped profile data:', JSON.stringify(mappedData, null, 2));
       
       return mappedData;
     } catch (error) {
-      console.log('💥 Get profile exception:', error);
+      console.log('Get profile exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to load profile');
     }
   }
@@ -73,7 +73,7 @@ export class UserService {
         PhoneNumber: userData.phoneNumber,
       };
       
-      console.log('🔍 Update user profile:', { url, payload });
+      console.log('Update user profile:', { url, payload });
       
       const response = await fetch(url, {
         method: 'PUT',
@@ -84,17 +84,17 @@ export class UserService {
         body: JSON.stringify(payload),
       });
 
-      console.log('📡 Update profile response status:', response.status);
+      console.log('Update profile response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Update profile error:', errorText);
+        console.log('Update profile error:', errorText);
         throw new Error(errorText || 'Failed to update profile');
       }
 
-      console.log('✅ Profile updated successfully');
+      console.log('Profile updated successfully');
     } catch (error) {
-      console.log('💥 Update profile exception:', error);
+      console.log('Update profile exception:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to update profile');
     }
   }

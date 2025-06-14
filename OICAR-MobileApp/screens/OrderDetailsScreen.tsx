@@ -64,9 +64,9 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
         ProductService.getAllItems()
       ]);
 
-      console.log('✅ Loaded order items:', orderItems.length);
-      console.log('✅ Loaded statuses:', statuses.length);
-      console.log('✅ Loaded products:', products.length);
+      console.log('Loaded order items:', orderItems.length);
+      console.log('Loaded statuses:', statuses.length);
+      console.log('Loaded products:', products.length);
 
       // Find order info from a previous call or create a minimal one
       // For now, we'll need to get the order info separately
@@ -77,8 +77,8 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
         throw new Error('Order not found');
       }
 
-      console.log('🔍 Found order info:', JSON.stringify(orderInfo, null, 2));
-      console.log('🔍 Order totalAmount from API:', orderInfo.totalAmount);
+              console.log('Found order info:', JSON.stringify(orderInfo, null, 2));
+        console.log('Order totalAmount from API:', orderInfo.totalAmount);
 
       // Combine order items with product details
       const itemsWithProducts: OrderItemWithProduct[] = orderItems.map(item => {
@@ -96,8 +96,8 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
         total + (item.subtotal || 0), 0
       );
 
-      console.log('🔍 Calculated total from items:', calculatedTotal);
-      console.log('🔍 API total amount:', orderInfo.totalAmount);
+              console.log('Calculated total from items:', calculatedTotal);
+        console.log('API total amount:', orderInfo.totalAmount);
 
       // Find status info
       const status = statuses.find(s => s.idStatus === orderInfo.statusID);
@@ -109,11 +109,11 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
         calculatedTotal: calculatedTotal > 0 ? calculatedTotal : (orderInfo.totalAmount || 0)
       };
 
-      console.log('✅ Order details loaded:', orderWithDetails);
+      console.log('Order details loaded:', orderWithDetails);
       setOrder(orderWithDetails);
       
     } catch (error) {
-      console.log('💥 Load order details error:', error);
+      console.log('Load order details error:', error);
       Alert.alert(
         'Error Loading Order',
         error instanceof Error ? error.message : 'Failed to load order details'

@@ -18,7 +18,7 @@ import { CartService } from './utils/cartService';
 import { JWTUtils } from './utils/jwtUtils';
 import { Alert } from 'react-native';
 
-// Config fix deployed - forcing new build to pick up config.ts changes
+
 
 type Screen = 'test' | 'login' | 'register' | 'home' | 'profile' | 'editProfile' | 'products' | 'cart' | 'orders' | 'sell';
 
@@ -31,9 +31,6 @@ function AppContent() {
     setAuthToken(token);
     setCurrentScreen('home');
     console.log('Login successful! Token received:', token ? 'Yes' : 'No');
-    console.log('🚀 Auto-deployment test - App updated!');
-    console.log('🔗 GitHub integration now active!');
-    console.log('🛠️ Fixed Vercel root directory configuration!');
     console.log('Testin build trigger error');
     console.log('Testing build trigger erro v2');
   };
@@ -71,67 +68,9 @@ function AppContent() {
   };
 
   const handleReorderItems = async (orderItems: any[]) => {
-    // TODO: Fix cart service integration
     Alert.alert('Feature Coming Soon', 'Reorder functionality will be available soon!');
-    /*
-    if (!authToken) {
-      Alert.alert('Authentication Required', 'Please log in to add items to cart');
-      return;
-    }
-
-    try {
-      console.log('🔄 Reordering items:', orderItems);
-      
-      // Get user ID from token
-      const parsed = JWTUtils.parseToken(authToken);
-      const userId = parsed?.id;
-      
-      if (!userId) {
-        Alert.alert('Error', 'Could not verify user identity');
-        return;
-      }
-
-      // Get or create user cart
-      let userCart = await CartService.getUserCart(parseInt(userId), authToken);
-      if (!userCart) {
-        userCart = await CartService.createCart(parseInt(userId), authToken);
-      }
-
-      // Add each order item to cart
-      for (const orderItem of orderItems) {
-        if (orderItem.product && orderItem.quantity > 0) {
-          await CartService.addItemToCart(
-            userCart.idCart,
-            orderItem.itemID,
-            orderItem.quantity,
-            authToken
-          );
-        }
-      }
-
-      Alert.alert(
-        'Items Added! 🛒',
-        `${orderItems.length} items have been added to your cart.`,
-        [
-          {
-            text: 'View Cart',
-            onPress: () => setCurrentScreen('cart')
-          },
-          {
-            text: 'Continue Shopping',
-            style: 'cancel'
-          }
-        ]
-      );
-
-    } catch (error) {
-      console.log('💥 Reorder error:', error);
-      Alert.alert('Error', 'Failed to add items to cart. Please try again.');
-    }
-    */
   };
 
-  // Navigation items for bottom navigation
   const getNavigationItems = () => [
     {
       id: 'home',
@@ -147,7 +86,7 @@ function AppContent() {
     },
     {
       id: 'cart',
-      icon: '🛒',
+      icon: 'Cart',
       label: 'Cart',
       onPress: () => setCurrentScreen('cart'),
     },
@@ -171,7 +110,6 @@ function AppContent() {
     },
   ];
 
-  // Screens that should show bottom navigation
   const screensWithBottomNav = ['home', 'products', 'cart', 'sell', 'orders', 'profile'];
   const showBottomNav = authToken && screensWithBottomNav.includes(currentScreen);
 

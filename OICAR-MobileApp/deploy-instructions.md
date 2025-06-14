@@ -1,6 +1,6 @@
 # OICAR Mobile App - Web Deployment Guide
 
-## 🌐 Deploy to Vercel (FREE)
+## Deploy to Vercel (FREE)
 
 ### Prerequisites
 - GitHub account
@@ -73,12 +73,12 @@ vercel
 - Can be "installed" via browser's "Add to Home Screen"
 
 ### Mobile Browser Features
-- ✅ Touch interactions
-- ✅ Responsive design  
-- ✅ API calls to your backend
-- ✅ Local storage for auth tokens
-- ✅ Camera access (via browser)
-- ⚠️ Some native features limited
+- Touch interactions
+- Responsive design  
+- API calls to your backend
+- Local storage for auth tokens
+- Camera access (via browser)
+- Some native features limited
 
-## 🎯 Expected Result
+## Expected Result
 Your app will be accessible at: `https://your-app-name.vercel.app` 

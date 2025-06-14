@@ -1,6 +1,6 @@
 # Web Compatibility Fixes
 
-## 📱➡️🌐 Making Your App Web-Compatible
+## Making Your App Web-Compatible
 
 ### Issue: expo-image-picker on Web
 Your `CreateItemScreen.tsx` uses `expo-image-picker` which has limited web support.
@@ -77,19 +77,19 @@ const pickImage = async (useCamera: boolean = false) => {
     const result = await pickImageUniversal(useCamera);
     // ... rest of the function stays the same
   } catch (error) {
-    console.log('💥 Error picking image:', error);
+    console.log('Error picking image:', error);
     Alert.alert('Error', 'Failed to select image. Please try again.');
   }
 };
 ```
 
-## ✅ Other Compatibility Notes
-- ✅ `expo-linear-gradient` - Works on web
-- ✅ `react-native-reanimated` - Has web support
-- ✅ `nativewind` - Works on web
-- ✅ API calls - Work perfectly on web
-- ✅ Navigation - Works on web
-- ✅ Authentication - Works on web
+## Other Compatibility Notes
+- `expo-linear-gradient` - Works on web
+- `react-native-reanimated` - Has web support
+- `nativewind` - Works on web
+- API calls - Work perfectly on web
+- Navigation - Works on web
+- Authentication - Works on web
 
-## 🎯 Result
+## Result
 Your app will work 99% the same on web with this small fix! 

@@ -56,7 +56,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
 
   const loadData = async () => {
     try {
-      console.log('🔄 Loading products and categories...');
+      console.log('Loading products and categories...');
       
       const [itemsData, categoriesData] = await Promise.all([
         ProductService.getAllItems(),
@@ -65,9 +65,9 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       
       setItems(itemsData);
       setCategories(categoriesData);
-      console.log(`✅ Loaded ${itemsData.length} items and ${categoriesData.length} categories`);
+      console.log(`Loaded ${itemsData.length} items and ${categoriesData.length} categories`);
     } catch (error) {
-      console.log('❌ Failed to load data:', error);
+      console.log('Failed to load data:', error);
       Alert.alert('Error', 'Failed to load products and categories');
     } finally {
       setLoading(false);
@@ -101,13 +101,13 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
     if (selectedCategory !== null) {
       // Find the category name for the selected category ID
       const selectedCategoryName = getCategoryName(selectedCategory);
-      console.log('🔍 Filtering by category:', { selectedCategory, selectedCategoryName });
+      console.log('Filtering by category:', { selectedCategory, selectedCategoryName });
       
       filtered = filtered.filter(item => {
         const hasMatchingCategoryId = item.itemCategoryID === selectedCategory;
         const hasMatchingCategoryName = (item as any).categoryName === selectedCategoryName;
         
-        console.log('🔍 Item filter check:', {
+        console.log('Item filter check:', {
           itemTitle: item.title,
           itemCategoryID: item.itemCategoryID,
           itemCategoryName: (item as any).categoryName,
@@ -122,7 +122,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
         return hasMatchingCategoryId || hasMatchingCategoryName;
       });
       
-      console.log('🔍 Filtered items count:', filtered.length);
+      console.log('Filtered items count:', filtered.length);
     }
 
     // Filter by search query
@@ -163,7 +163,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       
       setFilteredItems(filtered);
     } catch (error) {
-      console.log('❌ Search failed:', error);
+              console.log('Search failed:', error);
       Alert.alert('Error', 'Failed to search products');
     } finally {
       setSearchLoading(false);
@@ -184,13 +184,13 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
 
   const loadUserCart = useCallback(async () => {
     try {
-      console.log('🔄 Loading user cart...');
+      console.log('Loading user cart...');
       let userCart = await CartService.getUserCart();
       
       setCart(userCart);
-      console.log('✅ Cart loaded successfully');
+              console.log('Cart loaded successfully');
     } catch (error) {
-      console.log('❌ Failed to load cart:', error);
+              console.log('Failed to load cart:', error);
       // Don't show alert for cart loading errors - cart functionality is optional
     }
   }, []);
@@ -206,8 +206,8 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       return;
     }
 
-    console.log('🛒 === ADD TO CART DEBUG START ===');
-    console.log('🛒 Item to add:', {
+          console.log('ADD TO CART DEBUG START');
+      console.log('Item to add:', {
       idItem: item.idItem,
       title: item.title,
       description: item.description,
@@ -232,20 +232,20 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       isAvailableForPurchase: (item as any).isAvailableForPurchase,
       statusDisplay: (item as any).statusDisplay
     });
-    console.log('🛒 Item stock:', item.stockQuantity);
-
-    console.log('🛒 Set adding to cart for item:', item.idItem);
+          console.log('Item stock:', item.stockQuantity);
+      
+      console.log('Set adding to cart for item:', item.idItem);
     setAddingToCart(item.idItem);
 
     try {
-      console.log('🛒 Adding item to cart directly...');
-      console.log('🛒 Item ID:', item.idItem);
-      console.log('🛒 Quantity:', 1);
+              console.log('Adding item to cart directly...');
+        console.log('Item ID:', item.idItem);
+        console.log('Quantity:', 1);
       await CartService.addItemToCart(item.idItem, 1);
       Alert.alert('Success', 'Item added to cart!');
     } catch (error) {
-      console.log('💥 ADD TO CART ERROR:', error);
-      console.log('💥 Error details:', error);
+              console.log('ADD TO CART ERROR:', error);
+        console.log('Error details:', error);
       
       // Parse error message for better user experience
       let errorMessage = 'Failed to add item to cart';
@@ -268,7 +268,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = ({ navigation, token }) =>
       Alert.alert('Cannot Add to Cart', errorMessage);
     } finally {
       setAddingToCart(null);
-      console.log('🛒 === ADD TO CART DEBUG END ===');
+      console.log('ADD TO CART DEBUG END');
     }
   };
 
