@@ -214,6 +214,30 @@ If you can't connect to the database, make sure:
 - Try connecting with DBeaver first to make sure the credentials work
 - Make sure you're using SSL/TLS connection
 
+## Building APK for Android
+
+So if you want to create an actual APK file that you can install on Android devices, here's how to do it. This is useful if you want to share the app with someone or test it on a real device without going through the app store.
+
+First, make sure you're in the mobile app directory:
+```bash
+cd OICAR-MobileApp
+```
+
+Then you can build the APK using EAS Build, which is Expo's cloud build service:
+```bash
+npx eas build --platform android --profile preview
+```
+
+This will upload your code to Expo's servers and build the APK for you. It takes a few minutes, but when it's done you'll get a download link for the APK file.
+
+If you don't have EAS CLI installed, you might need to install it first:
+```bash
+npm install -g @expo/eas-cli
+```
+
+The build process will ask you to log in to your Expo account if you haven't already. Once the build is complete, you can download the APK and install it on any Android device.
+
+Just keep in mind that this creates a development build, so it's not optimized for production. But it's perfect for testing and sharing with your team.
 
 ---
 
