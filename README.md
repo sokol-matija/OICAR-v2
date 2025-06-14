@@ -239,6 +239,8 @@ The build process will ask you to log in to your Expo account if you haven't alr
 
 Just keep in mind that this creates a development build, so it's not optimized for production. But it's perfect for testing and sharing with your team.
 
----
+This is my latest version of the app. It has a G drive link so you can download it for yourself.
+https://drive.google.com/drive/folders/1J2PYLjEgZNwkMuWmLByXAmeFHYRVgZqW?usp=drive_link
+
 
 
